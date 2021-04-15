@@ -26,7 +26,6 @@ class StockBuy(Resource):
                              "WHERE user_id = ?"
         cursor.execute(get_user_point_sql, [user_id])
         point = cursor.fetchone()[0]
-        print("남은돈: ", point)
 
         get_stock_price_sql = "SELECT trade_price " \
                               "FROM StockInfos " \
@@ -72,12 +71,34 @@ class StockSell(Resource):
                             "FROM Users_Stock " \
                             "WHERE user_id = ? AND stock_id = ?"
         cursor.execute(get_own_count_sql, [user_id, stock_id])
-        result = cursor.fetchone()
+        try:
+            own_count = cursor.fetchone()[0]
+        except:
+            return Response(dumps({"message": "잘못된 요청입니다."}), status=404, mimetype='application/json')
 
-        sql = '''
-        INSERT
-        '''
-        return Response("", status=200, mimetype='application/json')
+        # 보유 주식 갯수 < 팔려는 갯수인 경우
+        if sell_count > own_count:
+            return Response(dumps({"message": "보유 주식의 갯수가 부족합니다."}), status=404, mimetype='application/json')
+
+        get_stock_price_sql = "SELECT trade_price " \
+                              "FROM StockInfos " \
+                              "WHERE stock_id = ? " \
+                              "ORDER BY updated_time DESC " \
+                              "LIMIT 1"
+        cursor.execute(get_stock_price_sql, [stock_id])
+        trade_price = cursor.fetchone()[0]
+
+        stock_selling_sql = "UPDATE Users_Stock " \
+                            "SET owning_numbers = owning_numbers - ? " \
+                            "WHERE user_id = ? AND stock_id = ?"
+        cursor.execute(stock_selling_sql, [sell_count, user_id, stock_id])
+        point_update_sql = "UPDATE Users " \
+                           "SET point = point + ? " \
+                           "WHERE user_id = ?"
+        cursor.execute(point_update_sql, [sell_count * trade_price, user_id])
+        conn.commit()
+
+        return Response(dumps({"message": "success"}), status=200, mimetype='application/json')
 
 
 # 보유 종목 조회 API
