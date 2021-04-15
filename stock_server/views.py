@@ -4,10 +4,9 @@ from flask_restful import Resource, Api
 from flask_jwt_extended import *
 import mariadb
 
-db_config = None
+db_config = {}
 with open('../config/db_config.txt', 'r') as file:
-    db_config_string = file.read()
-    db_config = loads(db_config_string)
+    db_config = loads(file.read())
 
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
