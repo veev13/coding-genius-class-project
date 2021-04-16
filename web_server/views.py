@@ -14,12 +14,11 @@ conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 
 
-def get_fetchone_or_404(error_message='잘못된 요청입니다.'):
+def get_fetchone_or_404(error_message="잘못된 요청입니다."):
     try:
         return cursor.fetchone()[0]
     except:
-        return Response(dumps({'message': error_message}), status=404, mimetype='application/json')
-
+        return Response(dumps({"message": error_message}), status=404, mimetype='application/json')
 
 data = [
     ['04-06', 82000],
@@ -33,7 +32,6 @@ data = [
     ['04-14', 83500],
     ['04-15', 83200],
 ]
-
 login_server = "http://localhost:5001"
 
 
