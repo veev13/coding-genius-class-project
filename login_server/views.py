@@ -54,5 +54,4 @@ class Login(Resource):
         headers = {
             "token": token
         }
-
         return Response(dumps({'message': 'success'}), headers=headers, status=200, mimetype='application/json')
