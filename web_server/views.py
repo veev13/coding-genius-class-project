@@ -36,10 +36,11 @@ data = [
 
 login_server = "http://localhost:5001"
 
+
 @app.route('/')
 def main_page():
     try:
-        verify_jwt_in_request()
+        print(verify_jwt_in_request())
         logged_in = True
     except:
         logged_in = False
@@ -51,27 +52,31 @@ def main_page():
               }
     return render_template('index.html', values=values)
 
+
 @app.route('/my')
 def my_page():
     pass
+
 
 @app.route('/login', methods=['POST'])
 def login(signup=False):
     if request.method == 'POST':
         json_data = request.form
-        id = json_data['id']
-        pwd = json_data['pwd']
         login_res = requests.post(login_server + '/login', json=json_data)
-        jwt = login_res.json()['token']
+        if login_res.status_code != 200:
+            return render_template('login.html', signup=signup, token=None)
+        jwt = login_res.headers['token']
         response = make_response(render_template('login.html', signup=signup, token=jwt))
         response.set_cookie("access_token_cookie", jwt)
         return response
 
+
 @app.route('/logout', methods=['POST'])
 def logout():
     res = make_response(redirect(url_for('main_page')))
-    res.set_cookie("access_token_cookie", None)
+    res.delete_cookie("access_token_cookie")
     return res
+
 
 @app.route('/signup', methods=['POST'])
 def signup():

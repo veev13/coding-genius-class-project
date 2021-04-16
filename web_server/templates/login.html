@@ -13,7 +13,9 @@
         {% if not signup %}
         alert("로그인 되었습니다.");
         {% endif %}
-        {% endif %}
+{% else %}
+        alert("로그인에 실패하였습니다.");
+{% endif %}
 
         document.getElementById("form").submit();
 
