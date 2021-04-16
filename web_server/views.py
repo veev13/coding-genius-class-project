@@ -2,15 +2,15 @@ from json import dumps, loads
 from flask import Response, jsonify, request, render_template, redirect, url_for, make_response
 import requests
 from __init__ import app
-import mariadb
 from flask_jwt_extended import *
+import pymysql
 
 db_config = None
 with open('../config/db_config.txt', 'r') as file:
     db_config_string = file.read()
     db_config = loads(db_config_string)
 
-conn = mariadb.connect(**db_config)
+conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
 
 
@@ -20,18 +20,7 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
     except:
         return Response(dumps({"message": error_message}), status=404, mimetype='application/json')
 
-data = [
-    ['04-06', 82000],
-    ['04-07', 83000],
-    ['04-08', 83200],
-    ['04-09', 84500],
-    ['04-10', 85000],
-    ['04-11', 85500],
-    ['04-12', 84300],
-    ['04-13', 83000],
-    ['04-14', 83500],
-    ['04-15', 83200],
-]
+
 login_server = "http://localhost:5001"
 
 
@@ -42,10 +31,27 @@ def main_page():
         logged_in = True
     except:
         logged_in = False
-    token = request.cookies.get('access_token_cookie')
-    print("쿠ㅋㅣ", token)
-    chart_data = [['날짜', '거래가']] + data
+
+    stock_info = {'name': '삼성전자', 'code': '005930'}
+    sql = """
+        SELECT updated_time,trade_price 
+        FROM StockInfos 
+        WHERE stock_id = %s
+        """
+    cursor.execute(sql, [stock_info['code']])
+    result = cursor.fetchall()
+    result_data = []
+    for a in result:
+        data = []
+        for b in a:
+            data.append(b)
+        result_data.append(data)
+    print(result_data)
+
+    chart_data = [['날짜', '거래가']] + result_data
+    chart_name = stock_info['name']
     values = {'chart_data': chart_data,
+              'chart_name': chart_name,
               'logged_in': logged_in,
               }
     return render_template('index.html', values=values)
