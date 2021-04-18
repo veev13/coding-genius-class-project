@@ -168,9 +168,14 @@ class StockAlarms(Resource):
             cursor.execute(sql, [user_id,stock_id,price,condition_type])
             conn.commit()
             
-        # 같은 설정을 요청할 때 예외처리 
+        # 이미 설정된 종목을 다시 설정할 때 예외처리 
         except mariadb.IntegrityError:
-            return Response(dumps({"message": "Settings already exist"}), status=204, mimetype='application/json')
+            sql = "UPDATE Alarms " \
+                  "SET price = ?, condition_type = ? " \
+                  "WHERE user_id = ? AND stock_id = ?"
+            cursor.execute(sql, [price,condition_type,user_id,stock_id])
+            conn.commit()
+            
 
         return Response(dumps({"message": "success"}), status=201, mimetype='application/json')
 
