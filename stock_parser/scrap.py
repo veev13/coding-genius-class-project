@@ -22,7 +22,7 @@ with open('../config/db_config.txt', 'r') as file:
 
 # db삽입
 def stock_quary(stock_code, trade_price, update_Time):
-    con = pymysql.connect(**config)
+    con = pymysql.connect(**db_config)
     cur= con.cursor()
 
     cur.execute("SELECT updated_time FROM StockInfos WHERE updated_time='{}'".format(update_Time))
