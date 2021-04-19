@@ -14,13 +14,10 @@ url= 'https://finance.naver.com/item/sise_time.nhn?code={}&thistime={}&page={}'
 header= {'User-agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"}
 
 # db config
-config = {
-    "host": "wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com",
-    "port": 3306,
-    "user": "admin",
-    "password": "asdf555!",
-    "database": "multicampus"
-}
+db_config = {}
+with open('../config/db_config.txt', 'r') as file:
+    db_config = loads(file.read())
+
 
 
 # db삽입
