@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <title>{% block title %}내일은 투자왕!{% endblock %}</title>
+</head>
+
+<body>
+
+<div id="header">
+    <h2 class="maintitle">내일은 투자왕</h2>
+    {% if not values.logged_in %}
+<form action="/login" method="post">
+    {% else %}
+    <form action="/logout" method="post">
+        {% endif %}
+        <table>{% if not values.logged_in %}
+            <tr>
+                <th>ID:</th>
+                <td><input name="id" type="text" value="" placeholder="ID"></td>
+            </tr>
+            <tr>
+                <th>PASSWORD:</th>
+                <td><input name="pwd" type="text" value="" placeholder="PASSWORD"></td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="로그인"></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td><input type="submit" value="로그아웃"></td>
+            </tr>
+            {% endif %}
+        </table>
+
+    </form>
+</div>
+
+<div id="menu">
+    <li><a href="{{ url_for('main_page') }}">Home</a></li>
+    </li>
+</div>
+
+{% block content %}
+    <div id="content">
+
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div id="footer">
+
+    </div>
+{% endblock %}
+
+</body>
+</html>
