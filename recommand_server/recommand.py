@@ -9,6 +9,8 @@ for i in range(5):
 
 
 url="SELECT price FROM StockInfos WHERE updated_time in (?,?,?,?,?)"
+
+
 def weather_sort(weather):
     # 리스트 두 개 받아서 짜기(날씨데이터 5개, 주식데이터 5개)
     weather_list = []

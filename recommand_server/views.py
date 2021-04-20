@@ -5,7 +5,7 @@ from flask_jwt_extended import *
 import mariadb
 from datetime import datetime, timedelta
 import time
-from recommand import get_min, get_max
+
 
 
 db_config = {}
