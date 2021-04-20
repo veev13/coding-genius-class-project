@@ -91,4 +91,3 @@ def signup():
         if message:
             return render_template('signup.html', message=message)
         return login(signup=True)
-
