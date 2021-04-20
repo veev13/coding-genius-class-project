@@ -1,8 +1,14 @@
 import pymysql
-from json import dumps, loads
-from datetime import datetime
+
+weather_data = [20, 10, 0, 25, 30, 1, 2, 3, 4, 5]
+stock_ids = ['207940','068270','051910','035720','035420','006400','005930','005490','005380','000660']
+Time = []
+
+for i in range(5):
+    Time.append("{:%Y-%m-%d-%H}-00".format(datetime.now()-timedelta(hours=i)))
 
 
+url="SELECT price FROM StockInfos WHERE updated_time in (?,?,?,?,?)"
 def weather_sort(weather):
     # 리스트 두 개 받아서 짜기(날씨데이터 5개, 주식데이터 5개)
     weather_list = []
@@ -82,44 +88,44 @@ def insert_rec(stock_code, total):
     conn.close()
 
 
-def get_max():
+# def get_max():
 
-    db_config = None
-    with open('./config/db_config.txt', 'r') as file:
-        db_config_string = file.read()
-        db_config = loads(db_config_string)
+#     db_config = None
+#     with open('../config/db_config.txt', 'r') as file:
+#         db_config_string = file.read()
+#         db_config = loads(db_config_string)
 
-    conn = pymysql.connect(**db_config)
-    cursor = conn.cursor()
+#     conn = pymysql.connect(**db_config)
+#     cursor = conn.cursor()
 
-    max = """
-    SELECT MAX(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
-    """
+#     max = """
+#     SELECT MAX(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
+#     """
 
-    cursor.execute(max)
+#     cursor.execute(max)
 
-    diff = cursor.fetchone()
-    diff = list(diff)
+#     diff = cursor.fetchone()
+#     diff = list(diff)
 
-    # print(diff[0])
-    return max
+#     # print(diff[0])
+#     return max
 
-def get_min():
+# def get_min():
 
-    db_config = None
-    with open('./config/db_config.txt', 'r') as file:
-        db_config_string = file.read()
-        db_config = loads(db_config_string)
+#     db_config = None
+#     with open('../config/db_config.txt', 'r') as file:
+#         db_config_string = file.read()
+#         db_config = loads(db_config_string)
 
-    conn = pymysql.connect(**db_config)
-    cursor = conn.cursor()
+#     conn = pymysql.connect(**db_config)
+#     cursor = conn.cursor()
 
-    min = """
-    SELECT MIN(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
-    """
-    cursor.execute(min)
-    sim = cursor.fetchone()
-    sim = list(sim)
-    # print(sim[0])
-    return min
-get_min()
+#     min = """
+#     SELECT MIN(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
+#     """
+#     cursor.execute(min)
+#     sim = cursor.fetchone()
+#     sim = list(sim)
+#     # print(sim[0])
+#     return min
+

@@ -5,7 +5,7 @@ from flask_jwt_extended import *
 import mariadb
 
 db_config = {}
-with open('../config/db_config.txt', 'r') as file:
+with open('./config/db_config.txt', 'r') as file:
     db_config = loads(file.read())
 
 conn = mariadb.connect(**db_config)
@@ -156,7 +156,7 @@ class StockAlarms(Resource):
         json_data = request.get_json()
         user_id = get_jwt_identity()
         stock_id = json_data['stock_id']
-        price = json_data['price']
+        stock_id = json_data['price']
         condition_type = json_data['condition_type']
 
         # 알람 설정을 db에 저장
