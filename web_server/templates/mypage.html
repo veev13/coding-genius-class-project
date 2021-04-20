@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+    <tr>
+        <th>보유 잔고:</th>
+        <td>{{values.my_point}}</td>
+    </tr>
+    <tr>
+        <th>보유 주식</th><th>보유 갯수</th><th>설명</th>
+    </tr>
+    {% for item in values.my_stocks %}
+    <tr>
+        <th>{{item.stock_name}}({{item.stock_id}})</th>
+        <td>{{item.owning_numbers}}</td>
+        <td>{{item.feature}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
-    <div id="chart" style="width: 900px; height: 500px"></div>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-
-
+<div id="chart" style="width: 900px; height: 500px"></div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
   google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(drawChart);
   values = {{values|tojson}};
@@ -21,10 +18,19 @@
 
     chart.draw(data, options);
   }
+   function setStockList(datalist){
+    var stock_list = values.stock_list;
+    for(let i in stock_list){
+        datalist.innerHTML += "<option value='"+stock_list[i].stock_name+"["+stock_list[i].stock_id+"]'>"
+        }
+   }
+   datalist = document.getElementById("stock_list");
+   setStockList(datalist);
 
-    </script>
-    <script>
+</script>
+<script>
     //let token = localStorage.getItem('token');
 
-    </script>
-    {% endblock %}
+
+</script>
+{% endblock %}

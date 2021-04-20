@@ -46,7 +46,6 @@ class StockBuy(Resource):
                               "LIMIT 1"
         cursor.execute(get_stock_price_sql, [stock_id])
         trade_price = get_fetchone_or_404()
-        print("trade_price:", trade_price)
         if type(trade_price) is wrappers.Response:
             return trade_price
         pay = trade_price * buy_count
@@ -121,12 +120,11 @@ class StockSell(Resource):
 class StockStatus(Resource):
     @jwt_required()
     def get(self):
-        # print(create_access_token(identity=1))
         user_id = get_jwt_identity()
         sql = "SELECT Users_Stock.stock_id, stock_name, feature, owning_numbers " \
               "FROM Users_Stock JOIN Stocks " \
               "WHERE user_id = ? AND Users_Stock.stock_id = Stocks.stock_id"
-        cursor.execute(sql, [user_id])  # TODO: TEST, USER ID or TOKEN 입력 요함
+        cursor.execute(sql, [user_id])
         result_set = cursor.fetchall()
         row_header = [x[0] for x in cursor.description]
         json_data = []
@@ -144,7 +142,7 @@ class UserPoint(Resource):
         sql = "SELECT user_id, login_id, point " \
               "FROM Users " \
               "WHERE user_id = ?"
-        cursor.execute(sql, [user_id])  # TODO: TEST, USER ID or TOKEN 입력 요함
+        cursor.execute(sql, [user_id])
         result = cursor.fetchone()
         row_header = [x[0] for x in cursor.description]
         json_data = dict(zip(row_header, result))
@@ -164,18 +162,30 @@ class StockAlarms(Resource):
         # 알람 설정을 db에 저장
         try:
             sql = "INSERT INTO Alarms(user_id, stock_id, price, condition_type) " \
-                "VALUES(?, ?, ?, ?)"
-            cursor.execute(sql, [user_id,stock_id,price,condition_type])
+                  "VALUES(?, ?, ?, ?)"
+            cursor.execute(sql, [user_id, stock_id, price, condition_type])
             conn.commit()
-            
+
         # 이미 설정된 종목을 다시 설정할 때 예외처리 
         except mariadb.IntegrityError:
             sql = "UPDATE Alarms " \
                   "SET price = ?, condition_type = ? " \
                   "WHERE user_id = ? AND stock_id = ?"
-            cursor.execute(sql, [price,condition_type,user_id,stock_id])
+            cursor.execute(sql, [price, condition_type, user_id, stock_id])
             conn.commit()
-            
 
         return Response(dumps({"message": "success"}), status=201, mimetype='application/json')
 
+
+# 주식 목록 조회 API
+class StockList(Resource):
+    def get(self):
+        sql = "SELECT *" \
+              "FROM Stocks "
+        cursor.execute(sql)
+        result_set = cursor.fetchall()
+        row_header = [x[0] for x in cursor.description]
+        json_data = []
+        for result in result_set:
+            json_data.append(dict(zip(row_header, result)))
+        return Response(dumps({"stock_list": json_data}), status=200, mimetype='application/json')
