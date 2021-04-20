@@ -3,11 +3,14 @@ from flask_restful import Api
 from flask_jwt_extended import *
 from json import loads
 import views
+import pymysql
 
 app = Flask(__name__)
 jwt_config = {}
-with open('../config/jwt_config.txt', 'r') as file:
+db_config = None
+with open('./config/jwt_config.txt', 'r') as file:
     jwt_config = loads(file.read())
+
 
 app.config.update(jwt_config)
 app.config.update(Debug=True)
