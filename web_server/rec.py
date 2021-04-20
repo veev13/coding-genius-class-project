@@ -95,15 +95,13 @@ def get_max():
     max = """
     SELECT MAX(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
     """
-    # min = """
-    # SELECT MIN(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
-    # """
+
     cursor.execute(max)
-    # cursor.execute(min)
+
     diff = cursor.fetchone()
     diff = list(diff)
-    # sim = cursor.fetchone()
-    print(diff[0])
+
+    # print(diff[0])
     return max
 
 def get_min():
@@ -122,6 +120,6 @@ def get_min():
     cursor.execute(min)
     sim = cursor.fetchone()
     sim = list(sim)
-    print(sim[0])
+    # print(sim[0])
     return min
 get_min()
