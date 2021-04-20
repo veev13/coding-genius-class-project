@@ -38,9 +38,18 @@
 
 <div id="menu">
     <li><a href="{{ url_for('main_page') }}">Home</a></li>
+    <li><a href="{{ url_for('my_page') }}">My Page</a></li>
     </li>
 </div>
 
+<div>
+    <form action="{{ url_for('stock_detail') }}">검색:
+        <input list="stock_list" type="search" name="stock"/>
+        <datalist id="stock_list">
+        </datalist>
+        <input type="submit" value="검색"/>
+    </form>
+</div>
 {% block content %}
     <div id="content">
 

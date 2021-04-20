@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <div id="chart" style="width: 900px; height: 500px"></div>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+  values = {{values|tojson}};
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable(values.chart_data);
+    var options = {
+      title: values.chart_name
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('chart'));
+
+    chart.draw(data, options);
+  }
+    </script>
+
+    {% endblock %}
