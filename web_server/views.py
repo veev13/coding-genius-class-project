@@ -73,6 +73,21 @@ def main_page():
     return render_template('index.html', values=values)
 
 
+@app.route('/point/charge')
+def copy_point():
+    if get_logged_in():
+        point = request.args.get('add')
+        user_id = get_jwt_identity()
+        # SQL injection 위험
+
+        sql = "UPDATE Users " \
+              f"SET point = point + {point} " \
+              f"WHERE user_id = {user_id}"
+        cursor.execute(sql)
+        conn.commit()
+    return redirect(url_for('main_page'))
+
+
 @app.route('/mypage')
 def my_page():
     jwt = request.cookies.get("access_token_cookie")
@@ -95,10 +110,6 @@ def my_page():
         my_point = my_point_res.json()['point']
         values['my_point'] = my_point
 
-    # my_stock_list_res = requests.post(user_server_host + '/point', headers=headers)
-    # my_stock_list = my_stock_list_res.json()
-    # values['my_point'] = my_stock_list
-
     return render_template('mypage.html', values=values)
 
 
@@ -112,10 +123,63 @@ def stock_detail():
     values = {
         'chart_data': get_stock_chart_data(stock_code),
         'chart_name': stock_name,
+        'chart_code': stock_code,
         'logged_in': get_logged_in(),
         'stock_list': get_stock_list(),
     }
     return render_template('stock.html', values=values)
+
+
+@app.route('/stock/sell', methods=['get', 'post'])
+def stock_sell():
+    stock_id = request.args.get('id')
+    stock_name = request.args.get('name')
+    stock_price = request.args.get('price')
+    if request.method == 'GET':
+        values = {
+            'trade_type': "매도",
+            'stock_name': stock_name,
+            'stock_id': stock_id,
+            'trade_price': stock_price,
+            'stock_list': get_stock_list(),
+        }
+        return render_template('stock_trade.html', values=values)
+    else:
+        jwt = request.cookies.get("access_token_cookie")
+        get_logged_in()
+        headers = {
+            "Authorization": "Bearer " + jwt,
+        }
+        json_data = request.form
+        trade_res = requests.post(stock_server_host + '/sell', json=json_data, headers=headers)
+        message = trade_res.json()['message']
+        return render_template('trade_ok.html', message=message)
+
+
+@app.route('/stock/buy', methods=['get', 'post'])
+def stock_buy():
+    stock_id = request.args.get('id')
+    stock_name = request.args.get('name')
+    stock_price = request.args.get('price')
+    if request.method == 'GET':
+        values = {
+            'trade_type': "매수",
+            'stock_name': stock_name,
+            'stock_id': stock_id,
+            'trade_price': stock_price,
+            'stock_list': get_stock_list(),
+        }
+        return render_template('stock_trade.html', values=values)
+    else:
+        jwt = request.cookies.get("access_token_cookie")
+        get_logged_in()
+        headers = {
+            "Authorization": "Bearer " + jwt,
+        }
+        json_data = request.form
+        trade_res = requests.post(stock_server_host + '/buy', json=json_data, headers=headers)
+        message = trade_res.json()['message']
+        return render_template('trade_ok.html', message=message)
 
 
 @app.route('/login', methods=['POST'])

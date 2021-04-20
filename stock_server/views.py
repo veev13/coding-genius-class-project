@@ -5,7 +5,7 @@ from flask_jwt_extended import *
 import mariadb
 
 db_config = {}
-with open('./config/db_config.txt', 'r') as file:
+with open('../config/db_config.txt', 'r') as file:
     db_config = loads(file.read())
 
 conn = mariadb.connect(**db_config)
@@ -30,7 +30,7 @@ class StockBuy(Resource):
         json_data = request.get_json()
         user_id = get_jwt_identity()
         stock_id = json_data['stock_id']
-        buy_count = json_data['count']
+        buy_count = int(json_data['count'])
 
         # 보유 포인트 확인
         get_user_point_sql = "SELECT point " \
@@ -55,9 +55,6 @@ class StockBuy(Resource):
                                "SET point = point - ? " \
                                "WHERE user_id = ?"
             cursor.execute(point_update_sql, [pay, user_id])
-            # own_stock_check_sql = "SELECT user_id " \
-            #                        "FROM Users_Stock " \
-            #                        "WHERE user_id = ? AND stock_id = ?"
             try:
                 own_stock_insert_sql = "INSERT INTO Users_Stock(user_id, stock_id, owning_numbers) " \
                                        "VALUES(?, ?, ?)"
@@ -68,7 +65,8 @@ class StockBuy(Resource):
                                        "WHERE user_id = ? AND stock_id = ?"
                 cursor.execute(own_stock_update_sql, [buy_count, user_id, stock_id])
             conn.commit()
-            return Response(dumps({"message": "success"}), status=201, mimetype='application/json')
+            return Response(dumps({"message": f"거래가 완료되었습니다.\n현재 보유 포인트: {point - pay}"}), status=201,
+                            mimetype='application/json')
         # 돈이 부족한 경우
         else:
             return Response(dumps({"message": "포인트가 부족합니다."}), status=200, mimetype='application/json')
@@ -80,7 +78,7 @@ class StockSell(Resource):
         json_data = request.get_json()
         user_id = get_jwt_identity()
         stock_id = json_data['stock_id']
-        sell_count = json_data['count']
+        sell_count = int(json_data['count'])
 
         get_own_count_sql = "SELECT owning_numbers " \
                             "FROM Users_Stock " \
@@ -113,7 +111,8 @@ class StockSell(Resource):
         cursor.execute(point_update_sql, [sell_count * trade_price, user_id])
         conn.commit()
 
-        return Response(dumps({"message": "success"}), status=200, mimetype='application/json')
+        return Response(dumps({"message": f"거래가 완료되었습니다.\n현재 보유 주식: {own_count - sell_count}"}), status=200,
+                        mimetype='application/json')
 
 
 # 보유 종목 조회 API
@@ -156,7 +155,7 @@ class StockAlarms(Resource):
         json_data = request.get_json()
         user_id = get_jwt_identity()
         stock_id = json_data['stock_id']
-        stock_id = json_data['price']
+        price = json_data['price']
         condition_type = json_data['condition_type']
 
         # 알람 설정을 db에 저장
