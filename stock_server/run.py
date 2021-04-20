@@ -18,6 +18,7 @@ api.add_resource(views.Test, '/test')
 stocks = '/stocks'
 api.add_resource(views.StockSell, stocks + '/sell')
 api.add_resource(views.StockBuy, stocks + '/buy')
+api.add_resource(views.StockAlarms, stocks + '/alarms') # 알람설정 API
 
 users = '/users'
 api.add_resource(views.StockStatus, users + '/stocks')

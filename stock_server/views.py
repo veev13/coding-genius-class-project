@@ -149,3 +149,33 @@ class UserPoint(Resource):
         row_header = [x[0] for x in cursor.description]
         json_data = dict(zip(row_header, result))
         return Response(dumps(json_data), status=200, mimetype='application/json')
+
+
+# 알람 설정 API
+class StockAlarms(Resource):
+    @jwt_required()
+    def post(self):
+        json_data = request.get_json()
+        user_id = get_jwt_identity()
+        stock_id = json_data['stock_id']
+        price = json_data['price']
+        condition_type = json_data['condition_type']
+
+        # 알람 설정을 db에 저장
+        try:
+            sql = "INSERT INTO Alarms(user_id, stock_id, price, condition_type) " \
+                "VALUES(?, ?, ?, ?)"
+            cursor.execute(sql, [user_id,stock_id,price,condition_type])
+            conn.commit()
+            
+        # 이미 설정된 종목을 다시 설정할 때 예외처리 
+        except mariadb.IntegrityError:
+            sql = "UPDATE Alarms " \
+                  "SET price = ?, condition_type = ? " \
+                  "WHERE user_id = ? AND stock_id = ?"
+            cursor.execute(sql, [price,condition_type,user_id,stock_id])
+            conn.commit()
+            
+
+        return Response(dumps({"message": "success"}), status=201, mimetype='application/json')
+
