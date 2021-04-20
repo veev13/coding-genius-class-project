@@ -17,33 +17,12 @@ url= 'https://finance.naver.com/item/sise_time.nhn?code={}&thistime={}&page={}'
 
 header= {'User-agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"}
 
+producer = KafkaProducer(acks=0,
+                         compression_type='gzip',
+                         bootstrap_servers=['127.0.0.1:9092'],
+                         value_serializer=lambda x: dumps(x).encode('utf-8')
+                         )
 
-# db config
-db_config = {}
-with open('../config/db_config.txt', 'r') as file:
-    db_config = loads(file.read())
-
-
-
-# db삽입
-def stock_query(stock_code, trade_price, updated_time):
-    con = pymysql.connect(**db_config)
-    cur= con.cursor()
-
-    cur.execute("SELECT updated_time FROM StockInfos WHERE updated_time='{}' AND stock_id='{}'".format(updated_time, stock_code))
-    exists_data = cur.fetchall()
-    if not exists_data:
-        sql= "INSERT INTO StockInfos(stock_id,trade_price,updated_time) VALUES('{}',{},'{}')"
-        
-        sql=sql.format(stock_code,trade_price,updated_time)
-
-        cur.execute(sql)
-        con.commit()
-        print(updated_time+'query success')
-    else: return 1
-    
-    
-    return 0
 
 # 문자열로 주식코드가 전달
 def stock_parser():
@@ -54,6 +33,8 @@ def stock_parser():
     cur.execute("SELECT stock_id FROM Stocks")
     stock_codes_all = cur.fetchall()
     
+    
+
     currentTime="{:%Y%m%d%H%M%S}".format(datetime.now())
 
     for stock_codes in stock_codes_all:
@@ -62,6 +43,11 @@ def stock_parser():
 
         parse_page=500
         try:
+            # 중복확인용 데이터 가져오기
+            cur.execute("SELECT updated_time FROM StockInfos WHERE stock_id='{}' ORDER BY updated_time DESC LIMIT 1".format(stock_code))
+            exists_data = cur.fetchall()[0]
+
+
             for page in range(1,parse_page):
             # 데이터 요청 
                 req = requests.get(url.format(stock_code,currentTime,page), headers=header)
@@ -81,10 +67,13 @@ def stock_parser():
                     updated_time="{:%Y-%m-%d-}{}".format(datetime.now(),updated_time)
 
                     # 중복데이터 확인
-                    cur.execute("SELECT updated_time FROM StockInfos WHERE updated_time='{}' AND stock_id='{}'".format(updated_time, stock_code))
-                    exists_data = cur.fetchall()
-                    if not exists_data:
-                        stock_query(stock_code,trade_price,updated_time)
+                    cur.execute("SELECT updated_time FROM StockInfos WHERE stock_id='{}' ORDER BY updated_time DESC LIMIT 1".format(stock_code))
+                    exists_data = cur.fetchall()[0]
+                    if updated_time == exists_data:
+                        data = {"schema": {"type": "struct", "fields": [{"type": "string", "field": "stock_id"}, {"type": "int32", "field": "trade_price"}, {"type": "string", "field": "updated_time"}], "name": "StockInfos"}, "payload": {"stock_id": stock_code, "trade_price": trade_price, "updated_time": updated_time}}
+
+                        producer.send('my_topic_users', value=data)
+                        producer.flush()
                     else: break
 
                 if exists_data:
@@ -98,10 +87,12 @@ def stock_parser():
                     updated_time = soup.select('body > table.type2 > tr:nth-child({}) > td:nth-child(1) > span'.format(info+11))[0].text
                     updated_time = updated_time.replace(':','-')
                     updated_time="{:%Y-%m-%d-}{}".format(datetime.now(),updated_time)
-                    cur.execute("SELECT updated_time FROM StockInfos WHERE updated_time='{}' AND stock_id='{}'".format(updated_time, stock_code))
-                    exists_data = cur.fetchall()
-                    if not exists_data:
-                        stock_query(stock_code,trade_price,updated_time)
+                    
+                    if  updated_time == exists_data:
+                        data = {"schema": {"type": "struct", "fields": [{"type": "string", "field": "stock_id"}, {"type": "int32", "field": "trade_price"}, {"type": "string", "field": "updated_time"}], "name": "StockInfos"}, "payload": {"stock_id": stock_code, "trade_price": trade_price, "updated_time": updated_time}}
+
+                        producer.send('my_topic_users', value=data)
+                        producer.flush()
                     else: break
 
                 if exists_data:
@@ -124,17 +115,6 @@ def thread_parser(next_call_in):
                     [next_call_in]).start()
 
 
-# 테스트 출력
-next_call_in = time.time()
-thread_parser(next_call_in)
-
-from kafka import KafkaProducer
-from json import dumps
-import time
-
-# dict (key, value) -> object
-# str -> string
-
 producer = KafkaProducer(acks=0,
                          compression_type='gzip',
                          bootstrap_servers=['127.0.0.1:9092'],
@@ -143,16 +123,7 @@ producer = KafkaProducer(acks=0,
 
 start = time.time()
 
-for i in range(10):
-    #data = {'name': 'Dowon-'+str(i)}
-    data = {"schema": {"type": "struct", "fields": [{"type": "int32", "field": "id"}, {"type": "string", "field": "user_id"}, {"type": "string", "field": "pwd"}, {"type": "string", "field": "NAME"}, {
-        "type": "int64", "name": "org.apache.kafka.connect.data.Timestamp", "version": 1, "field": "created_at"}], "name": "users"}, "payload": {"id": 10, "user_id": "new_test10", "pwd": "new_pwd10", "NAME": "NEW TEST USER10", "created_at": 1615349727000}}
 
-    producer.send('my_topic_users', value=data)
-    producer.flush()
 
 print("Doen. Elapsed time: ", (time.time()-start))
-
-
-
 
