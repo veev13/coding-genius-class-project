@@ -1,0 +1,13 @@
+{
+	"name" : "stock_sink_connect001",
+	"config" : {
+		"connector.class" : "io.confluent.connect.jdbc.JdbcSinkConnector",
+		"connection.url": "jdbc:mysql://wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com/multicampus",
+		"connection.user":"admin",
+		"connection.password":"asdf555!",
+		"delete.enabled":"false",
+		"tasks.max":"1",
+		"topics":"StockInfos"
+	}
+}
+
