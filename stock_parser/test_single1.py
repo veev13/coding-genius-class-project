@@ -22,12 +22,13 @@ producer = KafkaProducer(acks=0,
                          value_serializer=lambda x: dumps(x).encode('utf-8')
                          )
 
-stock_code='000660'
+# consul kv호출
+stock_code=requests.get('http://localhost:8500/v1/kv/stock_code1?raw').text
+db_config=loads(requests.get('http://localhost:8500/v1/kv/db_config?raw').text)
 
-db_config = {}
-with open('../config/db_config.txt', 'r') as file:
-    db_config = loads(file.read())
-
+# db_config = {}
+# with open('../config/db_config.txt', 'r') as file:
+#     db_config = loads(file.read())
 # 문자열로 주식코드가 전달
 def stock_parser():
 
