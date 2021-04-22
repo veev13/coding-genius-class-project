@@ -8,7 +8,7 @@ import pymysql
 app = Flask(__name__)
 jwt_config = {}
 db_config = None
-with open('./config/jwt_config.txt', 'r') as file:
+with open('../config/jwt_config.txt', 'r') as file:
     jwt_config = loads(file.read())
 
 
