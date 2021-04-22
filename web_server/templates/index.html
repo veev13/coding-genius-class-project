@@ -1,9 +1,9 @@
-<html>
-<head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
+{% extends 'base.html' %}
+{% block content %}
 
-
+<div id="chart" style="width: 900px; height: 500px"></div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
   google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(drawChart);
   values = {{values|tojson}};
@@ -11,45 +11,26 @@
   function drawChart() {
     var data = google.visualization.arrayToDataTable(values.chart_data);
     var options = {
-      title: '삼성전자'
+      title: values.chart_name
     };
 
     var chart = new google.visualization.LineChart(document.getElementById('chart'));
 
     chart.draw(data, options);
   }
-    </script>
-</head>
-<body>
-{% if not values.logged_in %}
-<form action="/login" method="post">
-    {% else %}
-    <form action="/logout" method="post">
-        {% endif %}
-        <table>{% if not values.logged_in %}
-            <tr>
-                <th>ID:</th>
-                <td><input name="id" type="text" value="" placeholder="ID"></td>
-            </tr>
-            <tr>
-                <th>PASSWORD:</th>
-                <td><input name="pwd" type="text" value="" placeholder="PASSWORD"></td>
-            </tr>
-            <tr>
-                <td><input type="submit" value="로그인"></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td><input type="submit" value="로그아웃"></td>
-            </tr>
-            {% endif %}
-        </table>
+   function setStockList(datalist){
+    var stock_list = values.stock_list;
+    for(let i in stock_list){
+        datalist.innerHTML += "<option value='"+stock_list[i].stock_name+"["+stock_list[i].stock_id+"]'>"
+        }
+   }
+   datalist = document.getElementById("stock_list");
+   setStockList(datalist);
 
-    </form>
-
-    <div id="chart" style="width: 900px; height: 500px"></div>
-</body>
+</script>
 <script>
     //let token = localStorage.getItem('token');
+
+
 </script>
-</html>
+{% endblock %}
