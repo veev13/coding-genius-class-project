@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 {% extends 'base.html' %}
 {% block content %}
 
@@ -5,10 +6,17 @@
     <div id="chart" style="width: 900px; height: 500px"></div>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
+=======
+<html>
+<head>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+>>>>>>> Stashed changes
 
 
   google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(drawChart);
+<<<<<<< Updated upstream
   values = {{values|tojson}};
 
   function drawChart() {
@@ -16,11 +24,25 @@
     var options = {
       title: values.chart_name
     };
+=======
+// data_queue.enqueue()
+// data_queue.dequeue()
+  function drawChart() {
+    // console.log(typeof('{{chartData}}'));
+    // var nn = '{{chartData}}';
+    // console.log(nn)
+    // console.log(JSON.parse(nn));
+    // var data = google.visualization.arrayToDataTable(JSON.parse('{{chartData}}'));
+    // var options = {
+    //   title: '삼성전자'
+    // };
 
-    var chart = new google.visualization.LineChart(document.getElementById('chart'));
+    // var chart = google.visualization.LineChart(document.getElementById('chart'));
+>>>>>>> Stashed changes
 
-    chart.draw(data, options);
+    // chart.draw(data, options);
   }
+<<<<<<< Updated upstream
 
     </script>
     <script>
@@ -28,3 +50,19 @@
 
     </script>
     {% endblock %}
+=======
+</script>
+</head>
+<body>
+
+
+
+  <div id="chart" style="width: 900px; height: 500px"></div>
+  {% for row in chartData%}
+  <tr>
+    <td>{{ row[0]</td>
+  </tr>
+  {% endfor %}
+</body>
+</html>
+>>>>>>> Stashed changes

@@ -1,4 +1,5 @@
 from json import dumps, loads
+<<<<<<< Updated upstream
 from flask import Response, jsonify, request, render_template, redirect, url_for, make_response
 import requests
 from __init__ import app
@@ -7,11 +8,18 @@ import pymysql
 =======
 from flask import Response, jsonify, request, render_template, make_response
 from __init__ import app
+=======
+from flask import Response, jsonify, request, render_template, make_response
+from __init__ import app
+>>>>>>> Stashed changes
 import pymysql
 import numpy as np
 
 db_config = None
+<<<<<<< Updated upstream
 with open('../config/db_config.txt', 'r') as file:
+=======
+>>>>>>> Stashed changes
 with open('./config/db_config.txt', 'r') as file:
     db_config_string = file.read()
     db_config = loads(db_config_string)
@@ -27,6 +35,7 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
     except:
         return Response(dumps({"message": error_message}), status=404, mimetype='application/json')
 
+<<<<<<< Updated upstream
 
 login_server = "http://localhost:5001"
 
@@ -98,6 +107,8 @@ def signup():
         if message:
             return render_template('signup.html', message=message)
         return login(signup=True)
+=======
+>>>>>>> Stashed changes
 data = [
     ['04-06', 82000],
     ['04-07', 83000],
