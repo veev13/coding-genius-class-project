@@ -8,4 +8,4 @@ with open('../config/jwt_config.txt', 'r') as file:
 app.config.update(jwt_config)
 jwt = JWTManager(app)
 
-app.run(host='0.0.0.0', port=5000)
+app.run(host='0.0.0.0', port=8000)

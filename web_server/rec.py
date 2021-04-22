@@ -1,6 +1,6 @@
 import pymysql
-
-weather = [20, 10, 0, 25, 30, 1, 2, 3, 4, 5]
+from json import dumps, loads
+from datetime import datetime
 
 
 def weather_sort(weather):
@@ -60,16 +60,66 @@ def recommand(weather_rate, price_rate):
     return total
 
 
-def insert_rec(total):
+def insert_rec(stock_code, total):
     db_config = None
-    with open('../config/db_config.txt', 'r') as file:
+    with open('./config/db_config.txt', 'r') as file:
         db_config_string = file.read()
         db_config = loads(db_config_string)
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
 
+ 
+    
     sql = """
-    INSERT INTO Recommands (similarity) values(%s)
+    INSERT INTO Recommands (stock_id,similarity) VALUES('{}',{})
     """
-    curs.execute(sql,)
+    sql = sql.format(stock_code, total)
+
+    cursor.execute(sql)
+    conn.commit()
+    print('query added')
+    conn.close()
+
+
+def get_max():
+
+    db_config = None
+    with open('./config/db_config.txt', 'r') as file:
+        db_config_string = file.read()
+        db_config = loads(db_config_string)
+
+    conn = pymysql.connect(**db_config)
+    cursor = conn.cursor()
+
+    max = """
+    SELECT MAX(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
+    """
+
+    cursor.execute(max)
+
+    diff = cursor.fetchone()
+    diff = list(diff)
+
+    # print(diff[0])
+    return max
+
+def get_min():
+
+    db_config = None
+    with open('./config/db_config.txt', 'r') as file:
+        db_config_string = file.read()
+        db_config = loads(db_config_string)
+
+    conn = pymysql.connect(**db_config)
+    cursor = conn.cursor()
+
+    min = """
+    SELECT MIN(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
+    """
+    cursor.execute(min)
+    sim = cursor.fetchone()
+    sim = list(sim)
+    # print(sim[0])
+    return min
+get_min()

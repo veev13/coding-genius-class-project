@@ -3,11 +3,14 @@ from flask_restful import Api
 from flask_jwt_extended import *
 from json import loads
 import views
+import pymysql
 
 app = Flask(__name__)
 jwt_config = {}
+db_config = None
 with open('../config/jwt_config.txt', 'r') as file:
     jwt_config = loads(file.read())
+
 
 app.config.update(jwt_config)
 app.config.update(Debug=True)
@@ -19,6 +22,7 @@ stocks = '/stocks'
 api.add_resource(views.StockSell, stocks + '/sell')
 api.add_resource(views.StockBuy, stocks + '/buy')
 api.add_resource(views.StockAlarms, stocks + '/alarms') # 알람설정 API
+api.add_resource(views.StockList, stocks) # 주식 목록 API
 
 users = '/users'
 api.add_resource(views.StockStatus, users + '/stocks')
