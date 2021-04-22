@@ -65,7 +65,7 @@ class StockBuy(Resource):
                                        "WHERE user_id = ? AND stock_id = ?"
                 cursor.execute(own_stock_update_sql, [buy_count, user_id, stock_id])
             conn.commit()
-            return Response(dumps({"message": f"거래가 완료되었습니다.\n현재 보유 포인트: {point - pay}"}), status=201,
+            return Response(dumps({"message": f"거래가 완료되었습니다. 현재 보유 포인트: {point - pay}"}), status=201,
                             mimetype='application/json')
         # 돈이 부족한 경우
         else:
@@ -111,7 +111,7 @@ class StockSell(Resource):
         cursor.execute(point_update_sql, [sell_count * trade_price, user_id])
         conn.commit()
 
-        return Response(dumps({"message": f"거래가 완료되었습니다.\n현재 보유 주식: {own_count - sell_count}"}), status=200,
+        return Response(dumps({"message": f"거래가 완료되었습니다. 현재 보유 주식: {own_count - sell_count}"}), status=200,
                         mimetype='application/json')
 
 

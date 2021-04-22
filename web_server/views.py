@@ -109,6 +109,7 @@ def my_page():
     if my_point_res.status_code == 200:
         my_point = my_point_res.json()['point']
         values['my_point'] = my_point
+    values['stock_list'] = get_stock_list()
 
     return render_template('mypage.html', values=values)
 
