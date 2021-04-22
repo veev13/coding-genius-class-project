@@ -3,6 +3,17 @@
 
 <head>
     <title>{% block title %}내일은 투자왕!{% endblock %}</title>
+    <!-- Custom fonts for this template-->
+
+    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet"
+          type="text/css">
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
+
 </head>
 
 <body>
@@ -10,47 +21,80 @@
 <div id="header">
     <h2 class="maintitle">내일은 투자왕</h2>
     {% if not values.logged_in %}
-<form action="/login" method="post">
-    {% else %}
-    <form action="/logout" method="post">
-        {% endif %}
-        <table>{% if not values.logged_in %}
-            <tr>
-                <th>ID:</th>
-                <td><input name="id" type="text" value="" placeholder="ID"></td>
-            </tr>
-            <tr>
-                <th>PASSWORD:</th>
-                <td><input name="pwd" type="text" value="" placeholder="PASSWORD"></td>
-            </tr>
-            <tr>
-                <td><input type="submit" value="로그인"></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td><input type="submit" value="로그아웃"></td>
-            </tr>
+    <form action="/login" method="post">
+        {% else %}
+        <form action="/logout" method="post">
             {% endif %}
-        </table>
+            <table>{% if not values.logged_in %}
+                <tr>
+                    <th>ID:</th>
+                    <td><input name="id" type="text" value="" placeholder="ID"></td>
+                </tr>
+                <tr>
+                    <th>PASSWORD:</th>
+                    <td><input name="pwd" type="text" value="" placeholder="PASSWORD"></td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="로그인"></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td><input type="submit" value="로그아웃"></td>
+                </tr>
+                {% endif %}
+            </table>
 
+        </form>
+</div>
+<div>
+    <form action="{{ url_for('stock_detail') }}">검색:
+        <input list="stock_list" type="search" name="stock"/>
+        <datalist id="stock_list">
+        </datalist>
+        <input type="submit" value="검색"/>
     </form>
 </div>
 
-<div id="menu">
-    <li><a href="{{ url_for('main_page') }}">Home</a></li>
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">내일은 투자왕
+<!--            <img src="{{url_for('static', filename='img/logo.png')}}"/> -->
+        </div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item">
+        <a href="{{ url_for('main_page') }}" class="nav-link">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            Home</a>
     </li>
-</div>
 
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item">
+        <a href="{{ url_for('my_page') }}" class="nav-link">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span></a>
+    </li>
+
+</ul>
 {% block content %}
-    <div id="content">
+<div id="content">
 
-    </div>
+</div>
 {% endblock %}
 
 {% block footer %}
-    <div id="footer">
+<div id="footer">
 
-    </div>
+</div>
 {% endblock %}
 
 </body>
