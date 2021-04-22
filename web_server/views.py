@@ -4,14 +4,21 @@ import requests
 from __init__ import app
 from flask_jwt_extended import *
 import pymysql
+=======
+from flask import Response, jsonify, request, render_template, make_response
+from __init__ import app
+import pymysql
+import numpy as np
 
 db_config = None
 with open('../config/db_config.txt', 'r') as file:
+with open('./config/db_config.txt', 'r') as file:
     db_config_string = file.read()
     db_config = loads(db_config_string)
 
 conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
+app.config["JSON_AS_ASCII"] = False
 
 
 def get_fetchone_or_404(error_message="잘못된 요청입니다."):
@@ -91,3 +98,31 @@ def signup():
         if message:
             return render_template('signup.html', message=message)
         return login(signup=True)
+data = [
+    ['04-06', 82000],
+    ['04-07', 83000],
+    ['04-08', 83200],
+    ['04-09', 84500],
+    ['04-10', 85000],
+    ['04-11', 85500],
+    ['04-12', 84300],
+    ['04-13', 83000],
+    ['04-14', 83500],
+    ['04-15', 83200],
+]
+@app.route('/')
+def main_page():
+    chart_data = [['날짜', '거래가']] + data
+    values = {'chart_data': chart_data}
+    return render_template('index.html', values=values)
+
+# @app.route("/test")
+# def test():
+#     sql = """
+#     select updated_time, trade_price from StockInfos
+#     """
+#     cursor.execute(sql)
+#     result = cursor.fetchall()
+#     # print(len(result))
+#     # print(result[0][0])
+#     # return result
