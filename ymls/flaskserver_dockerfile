@@ -13,5 +13,5 @@ RUN pip3 install requests
 RUN pip3 install mariadb
 RUN pip3 install pymysql
 
-CMD ["python", "./runner.py", "${RUN_FILE}"]
+CMD python runner.py ${RUN_FILE}
 
