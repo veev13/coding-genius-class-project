@@ -1,0 +1,12 @@
+{
+    "service": {
+        "name": "stock_server",
+        "tags": [
+            "stock_server"
+        ],
+        "port": 15002,
+        "connect": {
+            "sidecar_service": {}
+        }
+    }
+}
