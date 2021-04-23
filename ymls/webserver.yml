@@ -15,6 +15,7 @@ spec:
       containers:
       - name: webserver
         command: ['python', '/server/run.py']
+        # command: ['sleep', '6000']
         image: veev23/flask-server:1.0
         volumeMounts:
           - name: webserver-code
