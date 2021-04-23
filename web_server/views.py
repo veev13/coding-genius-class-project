@@ -6,13 +6,12 @@ from flask_jwt_extended import *
 import pymysql
 import re
 
-db_config = None
-with open('../config/db_config.txt', 'r') as file:
-    db_config_string = file.read()
-    db_config = loads(db_config_string)
+
+db_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
 
 conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
+app.config["JSON_AS_ASCII"] = False
 
 stock_server_host = 'http://127.0.0.1:5000/stocks'
 user_server_host = 'http://127.0.0.1:5000/users'
@@ -214,3 +213,33 @@ def signup():
         if message:
             return render_template('signup.html', message=message)
         return login(signup=True)
+# =======
+# >>>>>>> Stashed changes
+# data = [
+#     ['04-06', 82000],
+#     ['04-07', 83000],
+#     ['04-08', 83200],
+#     ['04-09', 84500],
+#     ['04-10', 85000],
+#     ['04-11', 85500],
+#     ['04-12', 84300],
+#     ['04-13', 83000],
+#     ['04-14', 83500],
+#     ['04-15', 83200],
+# ]
+# @app.route('/')
+# def main_page():
+#     chart_data = [['날짜', '거래가']] + data
+#     values = {'chart_data': chart_data}
+#     return render_template('index.html', values=values)
+
+# # @app.route("/test")
+# # def test():
+# #     sql = """
+# #     select updated_time, trade_price from StockInfos
+# #     """
+# #     cursor.execute(sql)
+# #     result = cursor.fetchall()
+# #     # print(len(result))
+# #     # print(result[0][0])
+# #     # return result

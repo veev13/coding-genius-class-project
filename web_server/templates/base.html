@@ -4,92 +4,94 @@
 <head>
     <title>{% block title %}내일은 투자왕!{% endblock %}</title>
     <!-- Custom fonts for this template-->
-
+    <link rel="stylesheet" href="css/bootstrap.css">
     <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet"
-          type="text/css">
+        type="text/css">
     <link
-            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-            rel="stylesheet">
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
     <script>
-    var values = {{values|tojson}};
+        var values = {{ values| tojson}};
 
     </script>
 </head>
 
 <body>
-<div class="text-center">
-    <a href="{{ url_for('main_page') }}" class="nav-link" style="padding:0px;">
-        <img src="{{url_for('static', filename='img/logo.png')}}" width="150" height="120"/></a>
-</div>
-<!-- Sidebar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a href="{{ url_for('main_page') }}" class="nav-link">
-                    Home</a>
-            </li>
-            <li class="nav-item active">
-                <a href="{{ url_for('my_page') }}" class="nav-link">
-                    MyPage</a>
-            </li>
-        </ul>
-        {% if not values.logged_in %}
-        <form class="form-inline my-2 my-lg-0" action="/login" method="post">
-            {% else %}
-            <form class="form-inline my-2 my-lg-0" action="/logout" method="post">
-                {% endif %}
-                {% if not values.logged_in %}
-                <input class="form-control"
-                       style="border-radius:30px; margin-right:30px;border:solid rgba(0,0,0,0) 3px;" name="id"
-                       type="text" value="" placeholder="ID">
-                <input class="form-control" style="border-radius:30px;margin-right:20px;border:solid rgba(0,0,0,0) 3px;"
-                       name="pwd" type="password" value="" placeholder="PASSWORD">
-                <button class="btn btn-success" type="submit">로그인</button>
-                {% else %}
-                <button class="btn btn-success" type="submit">로그아웃</button>
-                {% endif %}
-            </form>
+    <div class="text-center">
+        <a href="{{ url_for('main_page') }}" class="nav-link" style="padding:0px;">
+            <img src="{{url_for('static', filename='img/logo.png')}}" width="150" height="120" /></a>
     </div>
-</nav>
-<form class="form-inline my-2 my-lg-0 text-center" action="{{ url_for('stock_detail') }}">
-    <input class="form-control mr-sm-2" list="stock_list"
-           type="search" name="stock" placeholder="Search" aria-label="Search"/>
-    <datalist id="stock_list">
-    </datalist>
-    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-</form>
+    <!-- Sidebar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-{% block content %}
-<div id="content">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a href="{{ url_for('main_page') }}" class="nav-link">
+                        Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a href="{{ url_for('my_page') }}" class="nav-link">
+                        MyPage</a>
+                </li>
+            </ul>
+            {% if not values.logged_in %}
+            <form class="form-inline my-2 my-lg-0" action="/login" method="post">
+                {% else %}
+                <form class="form-inline my-2 my-lg-0" action="/logout" method="post">
+                    {% endif %}
+                    {% if not values.logged_in %}
+                    <input class="form-control"
+                        style="border-radius:30px; margin-right:30px;border:solid rgba(0,0,0,0) 3px;" name="id"
+                        type="text" value="" placeholder="ID">
+                    <input class="form-control"
+                        style="border-radius:30px;margin-right:20px;border:solid rgba(0,0,0,0) 3px;" name="pwd"
+                        type="password" value="" placeholder="PASSWORD">
+                    <button class="btn btn-success" type="submit">로그인</button>
+                    {% else %}
+                    <button class="btn btn-success" type="submit">로그아웃</button>
+                    {% endif %}
+                </form>
+        </div>
+    </nav>
+    <form class="form-inline my-2 my-lg-0 text-center" action="{{ url_for('stock_detail') }}">
+        <input class="form-control mr-sm-2" list="stock_list" type="search" name="stock" placeholder="Search"
+            aria-label="Search" />
+        <datalist id="stock_list">
+        </datalist>
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
 
-</div>
-{% endblock %}
+    {% block content %}
+    <div id="content">
 
-{% block footer %}
-<div id="footer">
+    </div>
+    {% endblock %}
 
-</div>
-{% endblock %}
+    {% block footer %}
+    <div id="footer">
+
+    </div>
+    {% endblock %}
 
 </body>
 <script>
-    function setStockList(datalist){
-    var stock_list = values.stock_list;
-    for(let i in stock_list){
-        datalist.innerHTML += "<option value='"+stock_list[i].stock_name+"["+stock_list[i].stock_id+"]'>"
+    function setStockList(datalist) {
+        var stock_list = values.stock_list;
+        for (let i in stock_list) {
+            datalist.innerHTML += "<option value='" + stock_list[i].stock_name + "[" + stock_list[i].stock_id + "]'>"
         }
-   }
-   datalist = document.getElementById("stock_list");
-   setStockList(datalist);
+    }
+    datalist = document.getElementById("stock_list");
+    setStockList(datalist);
 
 </script>
+
 </html>

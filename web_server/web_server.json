@@ -1,0 +1,24 @@
+{
+    "service":{
+        "name":"web_server",
+        "tags":["web_server"],
+        "port":15000,
+        "connect":{
+            "sidecar_service":{
+                "proxy":{
+                    "upstreams":[
+                        {
+                            "destination_name":"login_server",
+                            "local_bind_port": 16001
+                        },
+                        {
+                            "destination_name":"stock_server",
+                            "local_bind_port": 16002
+                        }
+                    ]
+
+                }
+            }
+        }
+    }
+}

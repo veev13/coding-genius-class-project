@@ -1,8 +1,44 @@
 <html>
 <head>
-  <title>Document</title>
+    <title>주식 {{values.trade_type}}</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css">
+    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet"
+          type="text/css">
+    <style>
+        header{
+        height:100px;
+        margin: 0px;
+        background-color: #5672d8;
+        color: #FFFFFF;
+        };
+
+    *{
+         font-family: 'NanumSquare', sans-serif;
+    };
+
+
+    </style>
 </head>
 <body>
-<h1>POPUP !!</h1>
+<header>
+    {{values.trade_type}}
+</header>
+<div>
+    {% if values.trade_type == '매수' %}
+    <form action="{{url_for('stock_buy')}}" method="post">
+        {% else %}
+    <form action="{{url_for('stock_sell')}}" method="post">
+        {% endif %}
+        <input type="hidden" name="stock_id" value="{{values.stock_id}}"/>
+    <p>종목명</p>
+    <p>{{values.stock_name}}</p>
+    <p>{{values.trade_type}} 가격</p>
+    <p><input value="{{values.trade_price}}" disabled/></p>
+    <p>{{values.trade_type}} 갯수</p>
+    <p><input value="1" type="number" name="count"/></p>
+    <input type="submit" value="{{values.trade_type}}"/>
+
+    </form>
+</div>
 </body>
 </html>
