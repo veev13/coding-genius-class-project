@@ -4,13 +4,15 @@ from flask_jwt_extended import *
 from json import loads
 import views
 import pymysql
+import consul
+import consul
 
 app = Flask(__name__)
-jwt_config = {}
-db_config = None
-with open('../config/jwt_config.txt', 'r') as file:
-    jwt_config = loads(file.read())
 
+c = consul.Consul(host='3.237.78.43', port=30500)
+index = None
+index, data = c.kv.get('jwt_config', index=index)
+jwt_config = loads(data['Value'])
 
 app.config.update(jwt_config)
 app.config.update(Debug=True)

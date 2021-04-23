@@ -5,11 +5,13 @@ from __init__ import app
 from flask_jwt_extended import *
 import pymysql
 import re
+import consul
 
-db_config = None
-with open('../config/db_config.txt', 'r') as file:
-    db_config_string = file.read()
-    db_config = loads(db_config_string)
+c = consul.Consul(host='3.237.78.43', port=30500)
+index = None
+
+index, data = c.kv.get('db_config', index=index)
+db_config = loads(data['Value'])
 
 conn = pymysql.connect(**db_config)
 cursor = conn.cursor()

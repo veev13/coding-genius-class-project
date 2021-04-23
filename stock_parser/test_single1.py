@@ -7,11 +7,22 @@ import time
 from kafka import KafkaProducer
 from json import dumps
 from json import loads
+import consul
 
-# 현재시간
+#consul kv 받아오기
+c = consul.Consul(host='3.237.78.43', port=30500)
+index = None
+
+index, data = c.kv.get('db_config', index=index)
+db_config = loads(data['Value'])
+
+index, data = c.kv.get('jwt_config', index=index)
+jwt_config = loads(data['Value'])
+
+#주식번호
+stock_code = 1
 
 # 파싱해오는 실시간 주식 정보의 url과 헤더
-# url에 code부분에 format{}로 코드값을 받아줌
 url= 'https://finance.naver.com/item/sise_time.nhn?code={}&thistime={}&page={}'
 
 header= {'User-agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"}
@@ -22,38 +33,20 @@ producer = KafkaProducer(acks=0,
                          value_serializer=lambda x: dumps(x).encode('utf-8')
                          )
 
-# consul kv호출
-stock_code=requests.get('http://localhost:8500/v1/kv/stock_code1?raw').text
-db_config=loads(requests.get('http://localhost:8500/v1/kv/db_config?raw').text)
 
-# db_config = {}
-# with open('../config/db_config.txt', 'r') as file:
-#     db_config = loads(file.read())
-# 문자열로 주식코드가 전달
 def stock_parser():
-
-    
-        
+     
     con = pymysql.connect(**db_config)
     cur = con.cursor()
-    # 주식코드 가져오기
-    # cur.execute("SELECT stock_id FROM Stocks")
-    # stock_codes_all = cur.fetchall()
-    
-
-    currentTime="{:%Y%m%d%H%M%S}".format(datetime.now())
-
-    parse_page=500
-    # try:
-    # 중복확인용 데이터 가져오기
     cur.execute("SELECT updated_time FROM StockInfos WHERE stock_id='{}' ORDER BY updated_time DESC LIMIT 1".format(stock_code))
     try:
         exists_data = cur.fetchall()[0]
     except:
         exists_data = 0
-    
-    
 
+    currentTime="{:%Y%m%d%H%M%S}".format(datetime.now())
+    parse_page=500
+    
     for page in range(1,parse_page):
     # 데이터 요청 
         req = requests.get(url.format(stock_code,currentTime,page), headers=header)

@@ -5,12 +5,13 @@ from flask_jwt_extended import *
 import mariadb
 from datetime import datetime, timedelta
 import time
+import consul
 
+c = consul.Consul(host='3.237.78.43', port=30500)
+index = None
 
-
-db_config = {}
-with open('../config/db_config.txt', 'r') as file:
-    db_config = loads(file.read())
+index, data = c.kv.get('db_config', index=index)
+db_config = loads(data['Value'])
 
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()

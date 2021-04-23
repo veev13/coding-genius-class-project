@@ -3,10 +3,13 @@ from flask import Response, jsonify, request, wrappers
 from flask_restful import Resource, Api
 from flask_jwt_extended import *
 import mariadb
+import consul
 
-db_config = {}
-with open('../config/db_config.txt', 'r') as file:
-    db_config = loads(file.read())
+c = consul.Consul(host='3.237.78.43', port=30500)
+index = None
+
+index, data = c.kv.get('db_config', index=index)
+db_config = loads(data['Value'])
 
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
