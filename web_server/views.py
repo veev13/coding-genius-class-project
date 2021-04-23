@@ -1,32 +1,13 @@
 from json import dumps, loads
-<<<<<<< Updated upstream
 from flask import Response, jsonify, request, render_template, redirect, url_for, make_response
 import requests
 from __init__ import app
 from flask_jwt_extended import *
 import pymysql
-<<<<<<< HEAD
-=======
-from flask import Response, jsonify, request, render_template, make_response
-from __init__ import app
-=======
-from flask import Response, jsonify, request, render_template, make_response
-from __init__ import app
->>>>>>> Stashed changes
-import pymysql
-import numpy as np
-=======
 import re
->>>>>>> a9c801f227e48143e1b302f0bfce3f83d0bb6e77
 
-db_config = None
-<<<<<<< Updated upstream
-with open('../config/db_config.txt', 'r') as file:
-=======
->>>>>>> Stashed changes
-with open('./config/db_config.txt', 'r') as file:
-    db_config_string = file.read()
-    db_config = loads(db_config_string)
+
+db_config = loads(requests.get('http://localhost:8500/v1/kv/db_config?raw').text)
 
 conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
@@ -43,7 +24,6 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
     except:
         return Response(dumps({"message": error_message}), status=404, mimetype='application/json')
 
-<<<<<<< Updated upstream
 
 def get_stock_chart_data(stock_code):
     sql = """
@@ -233,33 +213,33 @@ def signup():
         if message:
             return render_template('signup.html', message=message)
         return login(signup=True)
-=======
->>>>>>> Stashed changes
-data = [
-    ['04-06', 82000],
-    ['04-07', 83000],
-    ['04-08', 83200],
-    ['04-09', 84500],
-    ['04-10', 85000],
-    ['04-11', 85500],
-    ['04-12', 84300],
-    ['04-13', 83000],
-    ['04-14', 83500],
-    ['04-15', 83200],
-]
-@app.route('/')
-def main_page():
-    chart_data = [['날짜', '거래가']] + data
-    values = {'chart_data': chart_data}
-    return render_template('index.html', values=values)
+# =======
+# >>>>>>> Stashed changes
+# data = [
+#     ['04-06', 82000],
+#     ['04-07', 83000],
+#     ['04-08', 83200],
+#     ['04-09', 84500],
+#     ['04-10', 85000],
+#     ['04-11', 85500],
+#     ['04-12', 84300],
+#     ['04-13', 83000],
+#     ['04-14', 83500],
+#     ['04-15', 83200],
+# ]
+# @app.route('/')
+# def main_page():
+#     chart_data = [['날짜', '거래가']] + data
+#     values = {'chart_data': chart_data}
+#     return render_template('index.html', values=values)
 
-# @app.route("/test")
-# def test():
-#     sql = """
-#     select updated_time, trade_price from StockInfos
-#     """
-#     cursor.execute(sql)
-#     result = cursor.fetchall()
-#     # print(len(result))
-#     # print(result[0][0])
-#     # return result
+# # @app.route("/test")
+# # def test():
+# #     sql = """
+# #     select updated_time, trade_price from StockInfos
+# #     """
+# #     cursor.execute(sql)
+# #     result = cursor.fetchall()
+# #     # print(len(result))
+# #     # print(result[0][0])
+# #     # return result

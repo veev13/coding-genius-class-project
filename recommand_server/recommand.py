@@ -67,10 +67,7 @@ def recommand(weather_rate, price_rate):
 
 
 def insert_rec(stock_code, total):
-    db_config = None
-    with open('./config/db_config.txt', 'r') as file:
-        db_config_string = file.read()
-        db_config = loads(db_config_string)
+    db_config=loads(requests.get('http://localhost:8500/v1/kv/db_config?raw').text)
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
