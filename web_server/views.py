@@ -47,10 +47,12 @@ def get_stock_chart_data(stock_code):
 
 def get_stock_list():
     # 주식 목록 가져오기
-    stock_list_res = requests.get(stock_server_host)
-    if stock_list_res.status_code == 200:
-        return stock_list_res.json()['stock_list']
-    return []
+    try:
+        stock_list_res = requests.get(stock_server_host)
+        if stock_list_res.status_code == 200:
+            return stock_list_res.json()['stock_list']
+    except:
+        return []
 
 
 def get_logged_in():

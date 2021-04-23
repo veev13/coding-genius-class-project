@@ -6,7 +6,6 @@
 <script type="text/javascript">
   google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(drawChart);
-  values = {{values|tojson}};
 
   function drawChart() {
     var data = google.visualization.arrayToDataTable(values.chart_data);
