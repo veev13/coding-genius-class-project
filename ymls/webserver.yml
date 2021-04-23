@@ -14,15 +14,25 @@ spec:
     spec:
       containers:
       - name: webserver
-        command: ['python', '/server/run.py']
-        # command: ['sleep', '6000']
+        command: ['python', '/server/coding-genius-class-project.git/web_server/run.py']
         image: veev23/flask-server:1.0
         volumeMounts:
-          - name: webserver-code
-            mountPath: /server
+          - name: git-volume
+            mountPath: "/server"
         ports:
         - containerPort: 8000
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.1
+        env:
+        - name: GIT_SYNC_REPO                 # git sync할 리모트 저장소
+          value: https://github.com/veev13/coding-genius-class-project.git
+        - name: GIT_SYNC_BRANCH               # target branch
+          value: stock-server
+        - name: GIT_SYNC_ROOT                 # 로컬 디렉토리 위치
+          value: "/git"
+        volumeMounts:
+        - name: git-volume
+          mountPath: "/git"
       volumes:
-        - name: webserver-code
-          hostPath:
-            path: /coding-genius-class-project/web_server
+        - name: git-volume
+          emptyDir: {}
