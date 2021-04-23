@@ -3,15 +3,19 @@ from flask_restful import Api
 from flask_jwt_extended import *
 from json import loads
 import views
+import requests
 
 app = Flask(__name__)
 
-jwt_config = {}
-with open('../config/jwt_config.txt', 'r') as file:
-    jwt_config = loads(file.read())
+
+
+jwt_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/jwt_config?raw').text)
+
 
 app.config.update(jwt_config)
 jwt = JWTManager(app)
+
+
 api = Api(app)
 
 login = '/login'
