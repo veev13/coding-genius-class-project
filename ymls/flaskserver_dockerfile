@@ -6,8 +6,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install flask
 RUN pip3 install flask_restful
 RUN pip3 install flask_jwt_extended
-RUN pip3 install request
-RUN pip3 isntall mariadb
-RUN pip3 isntall pymysql
+RUN pip3 install requests
+RUN pip3 install mariadb
+RUN pip3 install pymysql
 
-CMD ['python', '/server/run.py']

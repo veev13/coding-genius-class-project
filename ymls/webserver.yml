@@ -2,28 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: webserver-deployment
-  labels:
-    app: webserver
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: webserver
+      run: webserver
   template:
     metadata:
       labels:
-        app: webserver
+        run: webserver
     spec:
       containers:
       - name: webserver
-        image: veev23/flask-server
+        command: ['python', '/server/run.py']
+        image: veev23/flask-server:1.0
         volumeMounts:
           - name: webserver-code
             mountPath: /server
         ports:
-        - containerPort: 5000
+        - containerPort: 8000
       volumes:
         - name: webserver-code
           hostPath:
-            path: ../webserver
----
+            path: /coding-genius-class-project/web_server
