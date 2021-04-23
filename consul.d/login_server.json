@@ -1,0 +1,10 @@
+{
+    "service":{
+        "name":"login_server",
+        "tags":["login_server"],
+        "port":15001,
+        "connect":{
+            "sidecar_service":{}
+        }
+    }
+}
