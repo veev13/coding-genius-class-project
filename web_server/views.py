@@ -213,33 +213,3 @@ def signup():
         if message:
             return render_template('signup.html', message=message)
         return login(signup=True)
-# =======
-# >>>>>>> Stashed changes
-# data = [
-#     ['04-06', 82000],
-#     ['04-07', 83000],
-#     ['04-08', 83200],
-#     ['04-09', 84500],
-#     ['04-10', 85000],
-#     ['04-11', 85500],
-#     ['04-12', 84300],
-#     ['04-13', 83000],
-#     ['04-14', 83500],
-#     ['04-15', 83200],
-# ]
-# @app.route('/')
-# def main_page():
-#     chart_data = [['날짜', '거래가']] + data
-#     values = {'chart_data': chart_data}
-#     return render_template('index.html', values=values)
-
-# # @app.route("/test")
-# # def test():
-# #     sql = """
-# #     select updated_time, trade_price from StockInfos
-# #     """
-# #     cursor.execute(sql)
-# #     result = cursor.fetchall()
-# #     # print(len(result))
-# #     # print(result[0][0])
-# #     # return result
