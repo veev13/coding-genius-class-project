@@ -7,7 +7,7 @@ import pymysql
 import requests
 
 app = Flask(__name__)
-db_config = None
+db_config=loads(requests.get('http://localhost:8500/v1/kv/db_config?raw').text)
 jwt_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/jwt_config?raw').text)
 
 app.config.update(jwt_config)
