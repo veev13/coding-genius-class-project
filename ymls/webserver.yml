@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webserver-deployment
+  labels:
+    app: webserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+      - name: webserver
+        image: veev23/flask-server
+        volumeMounts:
+          - name: webserver-code
+            mountPath: /server
+        ports:
+        - containerPort: 5000
+      volumes:
+        - name: webserver-code
+          hostPath:
+            path: ../webserver
+---

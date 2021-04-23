@@ -1,0 +1,13 @@
+# Dockerfile
+
+FROM python
+
+RUN pip3 install --upgrade pip
+RUN pip3 install flask
+RUN pip3 install flask_restful
+RUN pip3 install flask_jwt_extended
+RUN pip3 install request
+RUN pip3 isntall mariadb
+RUN pip3 isntall pymysql
+
+CMD ['python', '/server/run.py']
