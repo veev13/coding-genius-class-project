@@ -17,7 +17,7 @@ header= {'User-agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537
 
 
 # db config
-db_config=loads(requests.get('http://localhost:8500/v1/kv/db_config?raw').text)
+db_config=loads(requests.get('http://http://3.237.78.43:30500/v1/kv/db_config?raw').text)
 
 
 # db삽입

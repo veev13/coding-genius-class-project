@@ -7,7 +7,7 @@ import pymysql
 import re
 
 
-db_config = loads(requests.get('http://localhost:8500/v1/kv/db_config?raw').text)
+db_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
 
 conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
