@@ -3,11 +3,9 @@ from flask import Response, jsonify, request, wrappers
 from flask_restful import Resource, Api
 from flask_jwt_extended import *
 import mariadb
+import requests
 
-db_config = {}
-with open('../config/db_config.txt', 'r') as file:
-    db_config = loads(file.read())
-
+db_config=loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 
@@ -25,7 +23,7 @@ class Test(Resource):
 
 
 class StockBuy(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -65,7 +63,7 @@ class StockBuy(Resource):
                                        "WHERE user_id = ? AND stock_id = ?"
                 cursor.execute(own_stock_update_sql, [buy_count, user_id, stock_id])
             conn.commit()
-            return Response(dumps({"message": f"거래가 완료되었습니다.\n현재 보유 포인트: {point - pay}"}), status=201,
+            return Response(dumps({"message": f"거래가 완료되었습니다. 현재 보유 포인트: {point - pay}"}), status=201,
                             mimetype='application/json')
         # 돈이 부족한 경우
         else:
@@ -73,7 +71,7 @@ class StockBuy(Resource):
 
 
 class StockSell(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -111,13 +109,13 @@ class StockSell(Resource):
         cursor.execute(point_update_sql, [sell_count * trade_price, user_id])
         conn.commit()
 
-        return Response(dumps({"message": f"거래가 완료되었습니다.\n현재 보유 주식: {own_count - sell_count}"}), status=200,
+        return Response(dumps({"message": f"거래가 완료되었습니다. 현재 보유 주식: {own_count - sell_count}"}), status=200,
                         mimetype='application/json')
 
 
 # 보유 종목 조회 API
 class StockStatus(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT Users_Stock.stock_id, stock_name, feature, owning_numbers " \
@@ -135,7 +133,7 @@ class StockStatus(Resource):
 
 # 유저 보유 포인트 조회 API
 class UserPoint(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT user_id, login_id, point " \
@@ -150,7 +148,7 @@ class UserPoint(Resource):
 
 # 알람 설정 API
 class StockAlarms(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()

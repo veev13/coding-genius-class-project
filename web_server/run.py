@@ -1,9 +1,9 @@
 from views import app
 from flask_jwt_extended import *
 from json import loads
-jwt_config = {}
-with open('../config/jwt_config.txt', 'r') as file:
-    jwt_config = loads(file.read())
+import requests
+jwt_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/jwt_config?raw').text)
+
 
 app.config.update(jwt_config)
 jwt = JWTManager(app)

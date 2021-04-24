@@ -3,11 +3,9 @@ from flask import Response, jsonify, request, wrappers
 from flask_restful import Resource, Api
 from flask_jwt_extended import *
 import mariadb
+import requests
 
-db_config = None
-with open('../config/db_config.txt', 'r') as file:
-    db_config_string = file.read()
-    db_config = loads(db_config_string)
+db_config=loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
 
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
