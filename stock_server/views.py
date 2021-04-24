@@ -3,6 +3,7 @@ from flask import Response, jsonify, request, wrappers
 from flask_restful import Resource, Api
 from flask_jwt_extended import *
 import mariadb
+<<<<<<< HEAD
 import consul
 
 c = consul.Consul(host='54.152.246.15', port=8500)
@@ -11,6 +12,11 @@ index = None
 index, data = c.kv.get('db_config', index=index)
 db_config = loads(data['Value'])
 
+=======
+import requests
+
+db_config=loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
+>>>>>>> develop
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 
@@ -28,7 +34,7 @@ class Test(Resource):
 
 
 class StockBuy(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -78,7 +84,7 @@ class StockBuy(Resource):
 
 
 class StockSell(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -122,7 +128,7 @@ class StockSell(Resource):
 
 # 보유 종목 조회 API
 class StockStatus(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT Users_Stock.stock_id, stock_name, feature, owning_numbers " \
@@ -140,7 +146,7 @@ class StockStatus(Resource):
 
 # 유저 보유 포인트 조회 API
 class UserPoint(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT user_id, login_id, point " \
@@ -155,7 +161,7 @@ class UserPoint(Resource):
 
 # 알람 설정 API
 class StockAlarms(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()

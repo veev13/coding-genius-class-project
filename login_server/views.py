@@ -10,6 +10,7 @@ index = None
 index, data = c.kv.get('db_config', index=index)
 db_config = loads(data['Value'])
 
+
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 

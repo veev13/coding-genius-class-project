@@ -69,11 +69,16 @@ def recommand(weather_rate, price_rate):
     return similarity
 
 
+<<<<<<< HEAD
 def insert_rec(stock_id, similarity):
     db_config = None
     with open('../config/db_config.txt', 'r') as file:
         db_config_string = file.read()
         db_config = loads(db_config_string)
+=======
+def insert_rec(stock_code, total):
+    db_config=loads(requests.get('http://http://3.237.78.43:30500//v1/kv/db_config?raw').text)
+>>>>>>> develop
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()

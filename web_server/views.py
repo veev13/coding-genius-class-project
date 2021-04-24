@@ -7,14 +7,15 @@ import pymysql
 import re
 import consul
 
+
 c = consul.Consul(host='54.152.246.15', port=8500)
 index = None
 
 index, data = c.kv.get('db_config', index=index)
 db_config = loads(data['Value'])
-
 conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
+app.config["JSON_AS_ASCII"] = False
 
 stock_server_host = 'http://127.0.0.1:5000/stocks'
 user_server_host = 'http://127.0.0.1:5000/users'

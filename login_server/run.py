@@ -13,8 +13,11 @@ index, data = c.kv.get('jwt_config', index=index)
 jwt_config = loads(data['Value'])
 
 
+
 app.config.update(jwt_config)
 jwt = JWTManager(app)
+
+
 api = Api(app)
 
 login = '/login'
