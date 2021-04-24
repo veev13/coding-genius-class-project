@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+    <tr>
+        <form action="{{url_for('copy_point')}}">
+            <input type="hidden" name="add" value="1000000"/>
+            <th>보유 잔고:</th>
+            <td>{{values.my_point}}</td>
+            <td><input type="submit" value="충전"/></td>
+        </form>
+    </tr>
+</table>
+<br>
+<table>
+    <tr>
+        <th>보유 주식</th>
+        <th>보유 갯수</th>
+        <th>설명</th>
+    </tr>
+    {% for item in values.my_stocks %}
+    <tr>
+        <th>{{item.stock_name}}({{item.stock_id}})</th>
+        <td>{{item.owning_numbers}}</td>
+        <td>{{item.feature}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+
+
+<html>
+
+<head>
+    <title>Doument</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+
+    <script language="javascript">
+        function showPopup() { window.open("popupped.html", "a", "width=600, height=400, left=100, top=50"); }
+    </script>
+</head>
+
+<body>
+    
+
+    <input type="button" class="btn btn-primary" value="submit" onclick="showPopup();" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+</body>
+
+</html>
