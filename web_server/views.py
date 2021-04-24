@@ -7,7 +7,7 @@ import pymysql
 import re
 import consul
 
-c = consul.Consul(host='3.237.78.43', port=30500)
+c = consul.Consul(host='54.152.246.15', port=30500)
 index = None
 
 index, data = c.kv.get('db_config', index=index)
@@ -102,7 +102,8 @@ def my_page():
     headers = {
         "Authorization": "Bearer " + jwt,
     }
-    my_stock_list_res = requests.get(user_server_host + '/stocks', headers=headers)
+    my_stock_list_res = requests.get(
+        user_server_host + '/stocks', headers=headers)
     values['my_stocks'] = []
     if my_stock_list_res.status_code == 200:
         my_stock_list = my_stock_list_res.json()
@@ -156,7 +157,8 @@ def stock_sell():
             "Authorization": "Bearer " + jwt,
         }
         json_data = request.form
-        trade_res = requests.post(stock_server_host + '/sell', json=json_data, headers=headers)
+        trade_res = requests.post(
+            stock_server_host + '/sell', json=json_data, headers=headers)
         message = trade_res.json()['message']
         return render_template('trade_ok.html', message=message)
 
@@ -182,7 +184,8 @@ def stock_buy():
             "Authorization": "Bearer " + jwt,
         }
         json_data = request.form
-        trade_res = requests.post(stock_server_host + '/buy', json=json_data, headers=headers)
+        trade_res = requests.post(
+            stock_server_host + '/buy', json=json_data, headers=headers)
         message = trade_res.json()['message']
         return render_template('trade_ok.html', message=message)
 
@@ -195,7 +198,8 @@ def login(signup=False):
         if login_res.status_code != 200:
             return render_template('login.html', signup=signup, token=None)
         jwt = login_res.headers['token']
-        response = make_response(render_template('login.html', signup=signup, token=jwt))
+        response = make_response(render_template(
+            'login.html', signup=signup, token=jwt))
         response.set_cookie("access_token_cookie", jwt)
         return response
 

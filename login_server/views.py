@@ -5,7 +5,7 @@ from flask_jwt_extended import *
 import mariadb
 import consul
 
-c = consul.Consul(host='3.237.78.43', port=30500)
+c = consul.Consul(host='54.152.246.15', port=30500)
 index = None
 index, data = c.kv.get('db_config', index=index)
 db_config = loads(data['Value'])

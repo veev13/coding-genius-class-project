@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import time
 import consul
 
-c = consul.Consul(host='3.237.78.43', port=30500)
+c = consul.Consul(host='54.152.246.15', port=30500)
 index = None
 
 index, data = c.kv.get('db_config', index=index)
@@ -16,10 +16,11 @@ db_config = loads(data['Value'])
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 
-#추천 종목 API
+# 추천 종목 API
+
+
 class Recommand(Resource):
     def get(self):
-        
 
         max = """
         SELECT stock_id FROM Recommands WHERE similarity=(SELECT MAX(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10)
@@ -32,7 +33,5 @@ class Recommand(Resource):
         diff = cursor.fetchone()[0]
         cursor.execute(min)
         sim = cursor.fetchone()[0]
-        json_data={"max":diff,"min":sim}
+        json_data = {"max": diff, "min": sim}
         return Response(dumps(json_data), status=200, mimetype='application/json')
-
-

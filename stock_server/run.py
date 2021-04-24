@@ -9,7 +9,7 @@ import consul
 
 app = Flask(__name__)
 
-c = consul.Consul(host='3.237.78.43', port=30500)
+c = consul.Consul(host='54.152.246.15', port=30500)
 index = None
 index, data = c.kv.get('jwt_config', index=index)
 jwt_config = loads(data['Value'])
@@ -23,8 +23,8 @@ api.add_resource(views.Test, '/test')
 stocks = '/stocks'
 api.add_resource(views.StockSell, stocks + '/sell')
 api.add_resource(views.StockBuy, stocks + '/buy')
-api.add_resource(views.StockAlarms, stocks + '/alarms') # 알람설정 API
-api.add_resource(views.StockList, stocks) # 주식 목록 API
+api.add_resource(views.StockAlarms, stocks + '/alarms')  # 알람설정 API
+api.add_resource(views.StockList, stocks)  # 주식 목록 API
 
 users = '/users'
 api.add_resource(views.StockStatus, users + '/stocks')
