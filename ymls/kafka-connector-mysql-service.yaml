@@ -13,6 +13,8 @@ spec:
   - name: "28083"
     port: 28083
     targetPort: 28083
+    nodePort: 30500
+  type: NodePort
   selector:
     io.kompose.service: kafka-connector-mysql
 status:

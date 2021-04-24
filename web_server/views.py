@@ -7,7 +7,7 @@ import pymysql
 import re
 import consul
 
-c = consul.Consul(host='54.152.246.15', port=30500)
+c = consul.Consul(host='54.152.246.15', port=8500)
 index = None
 
 index, data = c.kv.get('db_config', index=index)
