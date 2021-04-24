@@ -31,4 +31,4 @@ users = '/users'
 api.add_resource(views.StockStatus, users + '/stocks')
 api.add_resource(views.UserPoint, users + '/point')
 
-app.run(host='0.0.0.0', port=5000, debug=True)
+app.run(host='0.0.0.0', port=15002, debug=True)
