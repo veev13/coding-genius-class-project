@@ -11,6 +11,5 @@ with open("logs.txt",'w') as f:
 while not os.path.isfile(sys.argv[1]):
     time.sleep(5)
 print("RUN!")
-os.execlp('python', sys.argv[1])
-
+os.system(f'python {sys.argv[1]}')
 
