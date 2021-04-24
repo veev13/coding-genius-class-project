@@ -14,8 +14,12 @@ spec:
     spec:
       containers:
       - name: webserver
-        command: ['python', '/server/coding-genius-class-project.git/web_server/run.py']
-        image: veev23/flask-server:1.0
+        env: 
+        - name: RUN_FILE
+          value: "/server/coding-genius-class-project.git/web_server/run.py"
+        command: ['sleep', '6000']
+        image: veev23/flask-server:1.1
+        imagePullPolicy: Always
         volumeMounts:
           - name: git-volume
             mountPath: "/server"
