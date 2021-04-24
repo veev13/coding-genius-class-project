@@ -8,7 +8,10 @@ for i in range(5):
     Time.append("{:%Y-%m-%d-%H}-00".format(datetime.now()-timedelta(hours=i)))
 
 
-url="SELECT price FROM StockInfos WHERE updated_time in (?,?,?,?,?)"
+url="SELECT stock_id, trade_price FROM StockInfos WHERE updated_time IN ('2021-04-19-15-58','2021-04-19-15-57','2021-04-19-15-56','2021-04-19-15-55','2021-04-19-15-54')"
+
+
+
 def weather_sort(weather):
     # 리스트 두 개 받아서 짜기(날씨데이터 5개, 주식데이터 5개)
     weather_list = []
@@ -59,25 +62,32 @@ def stock_sort(stock_id, price_list):
 
 
 def recommand(weather_rate, price_rate):
-    total = 0
+    similarity = 0
     for idx in range(len(price_rate)):
-        total = weather_rate[idx] - price_rate[idx]
-    total = round(total, 2)
-    return total
+        similarity = weather_rate[idx] - price_rate[idx]
+    similarity = round(similarity, 2)
+    return similarity
 
 
+<<<<<<< HEAD
+def insert_rec(stock_id, similarity):
+    db_config = None
+    with open('../config/db_config.txt', 'r') as file:
+        db_config_string = file.read()
+        db_config = loads(db_config_string)
+=======
 def insert_rec(stock_code, total):
     db_config=loads(requests.get('http://http://3.237.78.43:30500//v1/kv/db_config?raw').text)
+>>>>>>> develop
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
 
  
-    
     sql = """
     INSERT INTO Recommands (stock_id,similarity) VALUES('{}',{})
     """
-    sql = sql.format(stock_code, total)
+    sql = sql.format(stock_id, similarity)
 
     cursor.execute(sql)
     conn.commit()
@@ -85,44 +95,4 @@ def insert_rec(stock_code, total):
     conn.close()
 
 
-# def get_max():
-
-#     db_config = None
-#     with open('../config/db_config.txt', 'r') as file:
-#         db_config_string = file.read()
-#         db_config = loads(db_config_string)
-
-#     conn = pymysql.connect(**db_config)
-#     cursor = conn.cursor()
-
-#     max = """
-#     SELECT MAX(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
-#     """
-
-#     cursor.execute(max)
-
-#     diff = cursor.fetchone()
-#     diff = list(diff)
-
-#     # print(diff[0])
-#     return max
-
-# def get_min():
-
-#     db_config = None
-#     with open('../config/db_config.txt', 'r') as file:
-#         db_config_string = file.read()
-#         db_config = loads(db_config_string)
-
-#     conn = pymysql.connect(**db_config)
-#     cursor = conn.cursor()
-
-#     min = """
-#     SELECT MIN(similarity) FROM Recommands ORDER BY updated_time DESC LIMIT 10
-#     """
-#     cursor.execute(min)
-#     sim = cursor.fetchone()
-#     sim = list(sim)
-#     # print(sim[0])
-#     return min
 

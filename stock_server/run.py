@@ -4,11 +4,16 @@ from flask_jwt_extended import *
 from json import loads
 import views
 import pymysql
-import requests
+import consul
+
 
 app = Flask(__name__)
-db_config=loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
-jwt_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/jwt_config?raw').text)
+
+c = consul.Consul(host='54.152.246.15', port=8500)
+index = None
+index, data = c.kv.get('jwt_config', index=index)
+jwt_config = loads(data['Value'])
+
 
 app.config.update(jwt_config)
 app.config.update(Debug=True)
@@ -19,8 +24,8 @@ api.add_resource(views.Test, '/test')
 stocks = '/stocks'
 api.add_resource(views.StockSell, stocks + '/sell')
 api.add_resource(views.StockBuy, stocks + '/buy')
-api.add_resource(views.StockAlarms, stocks + '/alarms') # 알람설정 API
-api.add_resource(views.StockList, stocks) # 주식 목록 API
+api.add_resource(views.StockAlarms, stocks + '/alarms')  # 알람설정 API
+api.add_resource(views.StockList, stocks)  # 주식 목록 API
 
 users = '/users'
 api.add_resource(views.StockStatus, users + '/stocks')
