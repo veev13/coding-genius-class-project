@@ -1,0 +1,48 @@
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.0.0
+    privileged: true
+    ports:
+      - 32181:32181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:5.0.0
+    ports:
+      - 29092:29092
+    links:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka-connector-mysql:
+    image: confluentinc/cp-kafka-connect:latest
+    ports:
+      - 28083:28083
+    links:
+      - kafka
+      - zookeeper
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:29092
+      CONNECT_REST_PORT: 28083
+      CONNECT_GROUP_ID: "quickstart-avro"
+      CONNECT_CONFIG_STORAGE_TOPIC: "quickstart-avro-config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "quickstart-avro-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "quickstart-avro-status"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: DEBUG
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/jars"
+    volumes:
+      - $PWD/jars:/etc/kafka-connect/jars

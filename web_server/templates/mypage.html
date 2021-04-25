@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if values.logged_in %}
+<table>
+    <tr>
+        <form action="{{url_for('copy_point')}}">
+            <input type="hidden" name="add" value="1000000"/>
+            <th>보유 잔고:</th>
+            <td>{{values.my_point}}</td>
+            <td><input type="submit" value="충전"/></td>
+        </form>
+    </tr>
+</table>
+<br>
+<table>
+    <tr>
+        <th>보유 주식</th>
+        <th>보유 갯수</th>
+        <th>설명</th>
+    </tr>
+    {% for item in values.my_stocks %}
+    <tr>
+        <th>{{item.stock_name}}({{item.stock_code}})</th>
+        <td>{{item.owning_numbers}}</td>
+        <td>{{item.feature}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<div>로그인이 필요한 페이지입니다.</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,1 @@
+kubectl expose deploy webserver-deployment --type NodePort --name=webserver-service

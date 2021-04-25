@@ -1,0 +1,23 @@
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+</head>
+<body>
+<form id="form" action="/">
+</form>
+</body>
+<script>
+{% if token %}
+        localStorage.setItem('token', '{{token}}');
+        {% if not signup %}
+        alert("로그인 되었습니다.");
+        {% endif %}
+{% else %}
+        alert("로그인에 실패하였습니다.");
+{% endif %}
+
+        document.getElementById("form").submit();
+
+</script>
+</html>

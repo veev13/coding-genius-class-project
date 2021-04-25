@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-kafka
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kafka-connector-mysql
+  name: kafka-connector-mysql
+spec:
+  ports:
+  - name: "28083"
+    port: 28083
+    targetPort: 28083
+    nodePort: 30500
+  type: NodePort
+  selector:
+    io.kompose.service: kafka-connector-mysql
+status:
+  loadBalancer: {}
