@@ -17,12 +17,8 @@
 
     chart.draw(data, options);
   }
-
-
-</script>
-<script>
-    //let token = localStorage.getItem('token');
-
-
+  {% if message %}
+  alert('{{message}}');
+  {% endif %}
 </script>
 {% endblock %}

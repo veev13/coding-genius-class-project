@@ -16,10 +16,8 @@ jwt_config = loads(data['Value'])
 
 
 app.config.update(jwt_config)
-app.config.update(Debug=True)
 jwt = JWTManager(app)
 api = Api(app)
-api.add_resource(views.Test, '/test')
 
 stocks = '/stocks'
 api.add_resource(views.StockSell, stocks + '/sell')
@@ -31,4 +29,4 @@ users = '/users'
 api.add_resource(views.StockStatus, users + '/stocks')
 api.add_resource(views.UserPoint, users + '/point')
 
-app.run(host='0.0.0.0', port=15002, debug=True)
+app.run(host='0.0.0.0', port=15002)

@@ -22,13 +22,8 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
         return Response(dumps({"message": error_message}), status=404, mimetype='application/json')
 
 
-class Test(Resource):
-    def get(self):
-        return Response(dumps({"token": create_access_token(identity=1)}), status=200, mimetype='application/json')
-
-
 class StockBuy(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -62,13 +57,13 @@ class StockBuy(Resource):
                 own_stock_insert_sql = "INSERT INTO Users_Stock(user_id, stock_id, owning_numbers) " \
                                        "VALUES(?, ?, ?)"
                 cursor.execute(own_stock_insert_sql, [
-                               user_id, stock_id, buy_count])
+                    user_id, stock_id, buy_count])
             except:
                 own_stock_update_sql = "UPDATE Users_Stock " \
                                        "SET owning_numbers = owning_numbers + ? " \
                                        "WHERE user_id = ? AND stock_id = ?"
                 cursor.execute(own_stock_update_sql, [
-                               buy_count, user_id, stock_id])
+                    buy_count, user_id, stock_id])
             conn.commit()
             return Response(dumps({"message": f"거래가 완료되었습니다. 현재 보유 포인트: {point - pay}"}), status=201,
                             mimetype='application/json')
@@ -78,7 +73,7 @@ class StockBuy(Resource):
 
 
 class StockSell(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -122,10 +117,10 @@ class StockSell(Resource):
 
 # 보유 종목 조회 API
 class StockStatus(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
-        sql = "SELECT Users_Stock.stock_id, stock_name, feature, owning_numbers " \
+        sql = "SELECT stock_code, stock_name, feature, owning_numbers " \
               "FROM Users_Stock JOIN Stocks " \
               "WHERE user_id = ? AND Users_Stock.stock_id = Stocks.stock_id"
         cursor.execute(sql, [user_id])
@@ -140,7 +135,7 @@ class StockStatus(Resource):
 
 # 유저 보유 포인트 조회 API
 class UserPoint(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT user_id, login_id, point " \
@@ -155,7 +150,7 @@ class UserPoint(Resource):
 
 # 알람 설정 API
 class StockAlarms(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()

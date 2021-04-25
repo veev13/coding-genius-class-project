@@ -4,9 +4,13 @@ import requests
 from __init__ import app
 from flask_jwt_extended import *
 import pymysql
-import re
 import consul
 
+import sys
+from os import path
+
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from config import hosts
 
 c = consul.Consul(host='54.152.246.15', port=8500)
 index = None
@@ -17,9 +21,9 @@ conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
 app.config["JSON_AS_ASCII"] = False
 
-stock_server_host = 'http://127.0.0.1:5000/stocks'
-user_server_host = 'http://127.0.0.1:5000/users'
-login_server = "http://localhost:5001"
+stock_server_host = hosts.hosts.stock_server_service
+user_server_host = hosts.hosts.users_server_service
+login_server = hosts.hosts.login_server_service
 
 
 def get_fetchone_or_404(error_message="잘못된 요청입니다."):
