@@ -3,9 +3,14 @@ from flask import Response, jsonify, request, wrappers
 from flask_restful import Resource, Api
 from flask_jwt_extended import *
 import mariadb
-import requests
+import consul
 
-db_config=loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
+c = consul.Consul(host='54.152.246.15', port=8500)
+index = None
+
+index, data = c.kv.get('db_config', index=index)
+db_config = loads(data['Value'])
+
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 
@@ -56,12 +61,14 @@ class StockBuy(Resource):
             try:
                 own_stock_insert_sql = "INSERT INTO Users_Stock(user_id, stock_id, owning_numbers) " \
                                        "VALUES(?, ?, ?)"
-                cursor.execute(own_stock_insert_sql, [user_id, stock_id, buy_count])
+                cursor.execute(own_stock_insert_sql, [
+                               user_id, stock_id, buy_count])
             except:
                 own_stock_update_sql = "UPDATE Users_Stock " \
                                        "SET owning_numbers = owning_numbers + ? " \
                                        "WHERE user_id = ? AND stock_id = ?"
-                cursor.execute(own_stock_update_sql, [buy_count, user_id, stock_id])
+                cursor.execute(own_stock_update_sql, [
+                               buy_count, user_id, stock_id])
             conn.commit()
             return Response(dumps({"message": f"거래가 완료되었습니다. 현재 보유 포인트: {point - pay}"}), status=201,
                             mimetype='application/json')
@@ -163,7 +170,7 @@ class StockAlarms(Resource):
             cursor.execute(sql, [user_id, stock_id, price, condition_type])
             conn.commit()
 
-        # 이미 설정된 종목을 다시 설정할 때 예외처리 
+        # 이미 설정된 종목을 다시 설정할 때 예외처리
         except mariadb.IntegrityError:
             sql = "UPDATE Alarms " \
                   "SET price = ?, condition_type = ? " \
