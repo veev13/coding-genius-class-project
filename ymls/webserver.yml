@@ -17,21 +17,46 @@ spec:
         env: 
         - name: RUN_FILE
           value: "/server/coding-genius-class-project.git/web_server/run.py"
-        command: ['sleep', '6000']
-        image: veev23/flask-server:1.1
+        # command: ['sleep', '6000']
+        image: veev23/flask-server:2.0
         imagePullPolicy: Always
         volumeMounts:
           - name: git-volume
             mountPath: "/server"
         ports:
-        - containerPort: 8000
+        - containerPort: 15000
+      - name: loginserver
+        env:
+        - name: RUN_FILE
+          value: "/server/coding-genius-class-project.git/login_server/run.py"
+        # command: ['sleep', '6000']
+        image: veev23/flask-server:2.0
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: git-volume
+            mountPath: "/server"
+        ports:
+        - containerPort: 15001
+      - name: stockserver
+        env:
+        - name: RUN_FILE
+          value: "/server/coding-genius-class-project.git/stock_server/run.py"
+        # command: ['sleep', '6000']
+        image: veev23/flask-server:2.0
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: git-volume
+            mountPath: "/server"
+        ports:
+        - containerPort: 15002
+
       - name: git-sync
         image: k8s.gcr.io/git-sync:v3.1.1
         env:
         - name: GIT_SYNC_REPO                 # git sync할 리모트 저장소
           value: https://github.com/veev13/coding-genius-class-project.git
         - name: GIT_SYNC_BRANCH               # target branch
-          value: stock-server
+          value: develop
         - name: GIT_SYNC_ROOT                 # 로컬 디렉토리 위치
           value: "/git"
         volumeMounts:
