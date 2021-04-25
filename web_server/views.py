@@ -37,7 +37,7 @@ def get_stock_chart_data(stock_code):
     sql = """
             SELECT updated_time,trade_price 
             FROM StockInfos 
-            WHERE stock_id = %s
+            WHERE stock_code = %s
             """
     cursor.execute(sql, [stock_code])
     result = cursor.fetchall()
@@ -143,14 +143,14 @@ def stock_detail():
 
 @app.route('/stock/sell', methods=['get', 'post'])
 def stock_sell():
-    stock_id = request.args.get('id')
+    stock_code = request.args.get('code')
     stock_name = request.args.get('name')
     stock_price = request.args.get('price')
     if request.method == 'GET':
         values = {
             'trade_type': "매도",
             'stock_name': stock_name,
-            'stock_id': stock_id,
+            'stock_code': stock_code,
             'trade_price': stock_price,
             'stock_list': get_stock_list(),
         }
@@ -170,14 +170,14 @@ def stock_sell():
 
 @app.route('/stock/buy', methods=['get', 'post'])
 def stock_buy():
-    stock_id = request.args.get('id')
+    stock_code = request.args.get('code')
     stock_name = request.args.get('name')
     stock_price = request.args.get('price')
     if request.method == 'GET':
         values = {
             'trade_type': "매수",
             'stock_name': stock_name,
-            'stock_id': stock_id,
+            'stock_code': stock_code,
             'trade_price': stock_price,
             'stock_list': get_stock_list(),
         }
