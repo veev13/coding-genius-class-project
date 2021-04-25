@@ -25,11 +25,11 @@ google.charts.load('current', {'packages':['corechart']});
   }
   function stockSell(){
   let price = values.chart_data[values.chart_data.length-1][1];
-    window.open('{{url_for("stock_sell")}}?id={{values.chart_code}}&name={{values.chart_name}}&price='+price,'name','resizable=no width=600 height=500');return false;
+    window.open('{{url_for("stock_sell")}}?code={{values.chart_code}}&name={{values.chart_name}}&price='+price,'name','resizable=no width=600 height=500');return false;
     }
   function stockBuy(){
   let price = values.chart_data[values.chart_data.length-1][1];
-    window.open('{{url_for("stock_buy")}}?id={{values.chart_code}}&name={{values.chart_name}}&price='+price,'name','resizable=no width=600 height=500');return false;
+    window.open('{{url_for("stock_buy")}}?code={{values.chart_code}}&name={{values.chart_name}}&price='+price,'name','resizable=no width=600 height=500');return false;
     }
 
 </script>

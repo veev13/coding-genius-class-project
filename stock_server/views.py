@@ -27,8 +27,17 @@ class StockBuy(Resource):
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
-        stock_id = json_data['stock_id']
+        stock_code = json_data['stock_code']
         buy_count = int(json_data['count'])
+
+        # Stock Code to Stock ID
+        sql = "SELECT stock_id " \
+              "FROM Stocks " \
+              "WHERE stock_code = ?"
+        cursor.execute(sql, [stock_code])
+        stock_id = get_fetchone_or_404()
+        if type(stock_id) is wrappers.Response:
+            return stock_id
 
         # 보유 포인트 확인
         get_user_point_sql = "SELECT point " \
@@ -77,8 +86,17 @@ class StockSell(Resource):
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
-        stock_id = json_data['stock_id']
+        stock_code = json_data['stock_code']
         sell_count = int(json_data['count'])
+
+        # Stock Code to Stock ID
+        sql = "SELECT stock_id " \
+              "FROM Stocks " \
+              "WHERE stock_code = ?"
+        cursor.execute(sql, [stock_code])
+        stock_id = get_fetchone_or_404()
+        if type(stock_id) is wrappers.Response:
+            return stock_id
 
         get_own_count_sql = "SELECT owning_numbers " \
                             "FROM Users_Stock " \

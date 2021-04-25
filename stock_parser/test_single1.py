@@ -9,6 +9,13 @@ from json import dumps
 from json import loads
 import consul
 
+# hosts import
+import sys
+from os import path
+
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from config import hosts
+
 # consul kv 받아오기
 c = consul.Consul(host='54.152.246.15', port=8500)
 index = None
@@ -28,15 +35,14 @@ url = 'https://finance.naver.com/item/sise_time.nhn?code={}&thistime={}&page={}'
 header = {
     'User-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"}
 
-producer = KafkaProducer(acks=0,
-                         compression_type='gzip',
-                         bootstrap_servers=['127.0.0.1:9092'],
-                         value_serializer=lambda x: dumps(x).encode('utf-8')
-                         )
+# producer = KafkaProducer(acks=0,
+#                          compression_type='gzip',
+#                          bootstrap_servers=[hosts.hosts.kafka_bootstrap_server_service],
+#                          value_serializer=lambda x: dumps(x).encode('utf-8')
+#                          )
 
 
 def stock_parser():
-
     con = pymysql.connect(**db_config)
     cur = con.cursor()
     cur.execute(
@@ -54,30 +60,33 @@ def stock_parser():
         req = requests.get(url.format(
             stock_code, currentTime, page), headers=header)
 
-    # 데이터 추출
+        # 데이터 추출
         source = req.text
         soup = BeautifulSoup(source, 'html.parser')
 
         # 실시간 주가 추출
         for info in range(5):
             trade_price = soup.select(
-                'body > table.type2 > tr:nth-child({}) > td:nth-child(2) > span'.format(info+3))[0].text
+                'body > table.type2 > tr:nth-child({}) > td:nth-child(2) > span'.format(info + 3))[0].text
             trade_price = int(trade_price.replace(',', ''))
 
             # 현재시간 추출
             updated_time = soup.select(
-                'body > table.type2 > tr:nth-child({}) > td:nth-child(1) > span'.format(info+3))[0].text
+                'body > table.type2 > tr:nth-child({}) > td:nth-child(1) > span'.format(info + 3))[0].text
             updated_time = updated_time.replace(':', '-')
             updated_time = "{:%Y-%m-%d-}{}".format(
                 datetime.now(), updated_time)
 
             if updated_time != exists_data:
 
-                data = {"schema": {"type": "struct", "fields": [{"type": "string", "field": "stock_id"}, {"type": "int32", "field": "trade_price"}, {
-                    "type": "string", "field": "updated_time"}], "name": "stockinfos"}, "payload": {"stock_id": stock_code, "trade_price": trade_price, "updated_time": updated_time}}
+                data = {"schema": {"type": "struct", "fields": [{"type": "string", "field": "stock_id"},
+                                                                {"type": "int32", "field": "trade_price"}, {
+                                                                    "type": "string", "field": "updated_time"}],
+                                   "name": "stockinfos"},
+                        "payload": {"stock_id": stock_code, "trade_price": trade_price, "updated_time": updated_time}}
 
-                producer.send('StockInfos', value=data)
-                producer.flush()
+                # producer.send('StockInfos', value=data)
+                # producer.flush()
             else:
                 break
 
@@ -86,22 +95,25 @@ def stock_parser():
 
         for info in range(5):
             trade_price = soup.select(
-                'body > table.type2 > tr:nth-child({}) > td:nth-child(2) > span'.format(info+11))[0].text
+                'body > table.type2 > tr:nth-child({}) > td:nth-child(2) > span'.format(info + 11))[0].text
             trade_price = int(trade_price.replace(',', ''))
 
             # 현재시간 추출
             updated_time = soup.select(
-                'body > table.type2 > tr:nth-child({}) > td:nth-child(1) > span'.format(info+11))[0].text
+                'body > table.type2 > tr:nth-child({}) > td:nth-child(1) > span'.format(info + 11))[0].text
             updated_time = updated_time.replace(':', '-')
             updated_time = "{:%Y-%m-%d-}{}".format(
                 datetime.now(), updated_time)
 
             if updated_time != exists_data:
-                data = {"schema": {"type": "struct", "fields": [{"type": "string", "field": "stock_id"}, {"type": "int32", "field": "trade_price"}, {
-                    "type": "string", "field": "updated_time"}], "name": "stockinfos"}, "payload": {"stock_id": stock_code, "trade_price": trade_price, "updated_time": updated_time}}
+                data = {"schema": {"type": "struct", "fields": [{"type": "string", "field": "stock_id"},
+                                                                {"type": "int32", "field": "trade_price"}, {
+                                                                    "type": "string", "field": "updated_time"}],
+                                   "name": "stockinfos"},
+                        "payload": {"stock_id": stock_code, "trade_price": trade_price, "updated_time": updated_time}}
 
-                producer.send('StockInfos', value=data)
-                producer.flush()
+                # producer.send('StockInfos', value=data)
+                # producer.flush()
             else:
                 break
 
@@ -114,15 +126,14 @@ def stock_parser():
     # 실시간 주식 가격 반환
     return 0
 
+
 # 쓰레드를 통해 반복 실행
-
-
 def thread_parser(next_call_in):
     next_call_in += 60
 
     Time = "{:%H-%M}".format(datetime.now())
 
-    if '15-30' > Time and '09-00' < Time:
+    if True or '15-30' > Time and '09-00' < Time:
         stock_parser()
 
     threading.Timer(next_call_in - time.time(),
