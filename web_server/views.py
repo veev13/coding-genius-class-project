@@ -71,7 +71,10 @@ def main_page():
     }
     chart_data = get_stock_chart_data(stock_code)
     if not type(chart_data) == str:
-        values['chart_data'] = chart_data
+        if len(chart_data) == 1:
+            values['message'] = "데이터가 없습니다."
+        else:
+            values['chart_data'] = chart_data
     else:
         values['message'] = chart_data
     return render_template('index.html', values=values)
@@ -100,7 +103,7 @@ def my_page():
         'stock_list': get_stock_list(),
     }
     headers = {
-        "Authorization": "Bearer " + jwt,
+        "Authorization": "Bearer " + (jwt if jwt else ""),
     }
     my_stock_list_res = requests.get(
         user_server_host + '/stocks', headers=headers)
@@ -134,7 +137,10 @@ def stock_detail():
     }
     chart_data = get_stock_chart_data(stock_code)
     if not type(chart_data) == str:
-        values['chart_data'] = chart_data
+        if len(chart_data) == 1:
+            values['message'] = "데이터가 없습니다."
+        else:
+            values['chart_data'] = chart_data
     else:
         values['message'] = chart_data
     return render_template('stock.html', values=values)
@@ -158,7 +164,7 @@ def stock_sell():
         jwt = request.cookies.get("access_token_cookie")
         get_logged_in()
         headers = {
-            "Authorization": "Bearer " + jwt,
+            "Authorization": "Bearer " + (jwt if jwt else ""),
         }
         json_data = request.form
         trade_res = requests.post(
@@ -185,7 +191,7 @@ def stock_buy():
         jwt = request.cookies.get("access_token_cookie")
         get_logged_in()
         headers = {
-            "Authorization": "Bearer " + jwt,
+            "Authorization": "Bearer " + (jwt if jwt else ""),
         }
         json_data = request.form
         trade_res = requests.post(
