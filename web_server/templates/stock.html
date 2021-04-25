@@ -5,8 +5,6 @@
 {% if message %}
 <div>{{message}}</div>
 {% endif %}
-
-{% if values.chart_data %}
 <div id="chart" style="width: 900px; height: 500px"></div>
 {% if values.logged_in %}
 <a href="#" class="btn btn-success" onclick="stockSell()">매도</a>
@@ -17,7 +15,6 @@
 
 google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(drawChart);
-  values = {{values|tojson}};
 
   function drawChart() {
     var data = google.visualization.arrayToDataTable(values.chart_data);
@@ -40,5 +37,4 @@ google.charts.load('current', {'packages':['corechart']});
 
 
 </script>
-{% endif %}
 {% endblock %}
