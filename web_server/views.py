@@ -34,22 +34,11 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
 
 
 def get_stock_chart_data(stock_code):
-    sql = """
-            SELECT updated_time,trade_price 
-            FROM StockInfos 
-            WHERE stock_code = %s
-            """
-    cursor.execute(sql, [stock_code])
-    result = cursor.fetchall()
-    result_data = []
-    for a in result:
-        data = []
-        for b in a:
-            data.append(b)
-        result_data.append(data)
-
-    chart_data = [['날짜', '거래가']] + result_data
-    return chart_data
+    chart_res = requests.get(stock_server_host + f'/chart?code={stock_code}')
+    if chart_res.status_code == 200:
+        return chart_res.json()['chart_data']
+    else:
+        return chart_res.json()['message']
 
 
 def get_stock_list():
@@ -74,11 +63,17 @@ def get_logged_in():
 def main_page():
     stock_name = '삼성전자'
     stock_code = '005930'
-    values = {'chart_data': get_stock_chart_data(stock_code),
-              'chart_name': stock_name,
-              'logged_in': get_logged_in(),
-              'stock_list': get_stock_list(),
-              }
+
+    values = {
+        'chart_name': stock_name,
+        'logged_in': get_logged_in(),
+        'stock_list': get_stock_list(),
+    }
+    chart_data = get_stock_chart_data(stock_code)
+    if not type(chart_data) == str:
+        values['chart_data'] = chart_data
+    else:
+        values['message'] = chart_data
     return render_template('index.html', values=values)
 
 
@@ -132,12 +127,16 @@ def stock_detail():
     stock_name = stock[:bungi]
     stock_code = stock[bungi + 1:-1]
     values = {
-        'chart_data': get_stock_chart_data(stock_code),
         'chart_name': stock_name,
         'chart_code': stock_code,
         'logged_in': get_logged_in(),
         'stock_list': get_stock_list(),
     }
+    chart_data = get_stock_chart_data(stock_code)
+    if not type(chart_data) == str:
+        values['chart_data'] = chart_data
+    else:
+        values['message'] = chart_data
     return render_template('stock.html', values=values)
 
 

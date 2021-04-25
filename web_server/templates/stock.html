@@ -2,6 +2,11 @@
 {% block content %}
 
 
+{% if message %}
+<div>{{message}}</div>
+{% endif %}
+
+{% if values.chart_data %}
 <div id="chart" style="width: 900px; height: 500px"></div>
 {% if values.logged_in %}
 <a href="#" class="btn btn-success" onclick="stockSell()">매도</a>
@@ -9,6 +14,7 @@
 {% endif %}
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+
 google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(drawChart);
   values = {{values|tojson}};
@@ -32,6 +38,7 @@ google.charts.load('current', {'packages':['corechart']});
     window.open('{{url_for("stock_buy")}}?code={{values.chart_code}}&name={{values.chart_name}}&price='+price,'name','resizable=no width=600 height=500');return false;
     }
 
-</script>
 
+</script>
+{% endif %}
 {% endblock %}
