@@ -12,11 +12,8 @@ index = None
 index, data = c.kv.get('jwt_config', index=index)
 jwt_config = loads(data['Value'])
 
-
-
 app.config.update(jwt_config)
 jwt = JWTManager(app)
-
 
 api = Api(app)
 
@@ -25,4 +22,4 @@ api.add_resource(views.Login, login)
 signup = '/signup'
 api.add_resource(views.SignUp, signup)
 
-app.run(host='0.0.0.0', port=15001, debug=True)
+app.run(host='0.0.0.0', port=15001)
