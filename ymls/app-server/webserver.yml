@@ -47,6 +47,18 @@ spec:
         ports:
         - containerPort: 15002
 
+      - name: recommandserver
+        env:
+        - name: RUN_FILE
+          value: "/server/coding-genius-class-project.git/recommand_server/run.py"
+        image: veev23/flask-server:2.0
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: git-volume
+            mountPath: "/server"
+        ports:
+        - containerPort: 15003
+
       - name: git-sync
         image: k8s.gcr.io/git-sync:v3.1.1
         env:
