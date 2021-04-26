@@ -19,6 +19,7 @@ spec:
           value: "/server/coding-genius-class-project.git/alarm_server/run.py"
         image: veev23/kafka-boto3-alarmserver:1.0
         imagePullPolicy: Always
+        # command: ['sleep', '60000']
         volumeMounts:
           - name: git-volume
             mountPath: "/server"
