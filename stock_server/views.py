@@ -56,7 +56,7 @@ class StockChartData(Resource):
 
 
 class StockBuy(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -110,7 +110,7 @@ class StockBuy(Resource):
 
 
 class StockSell(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -158,7 +158,7 @@ class StockSell(Resource):
 
 # 보유 종목 조회 API
 class StockStatus(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT stock_code, stock_name, feature, owning_numbers " \
@@ -176,7 +176,7 @@ class StockStatus(Resource):
 
 # 유저 보유 포인트 조회 API
 class UserPoint(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT user_id, login_id, point " \
@@ -191,7 +191,7 @@ class UserPoint(Resource):
 
 # 알람 설정 API
 class StockAlarms(Resource):
-    @jwt_required()
+    @jwt_required
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
