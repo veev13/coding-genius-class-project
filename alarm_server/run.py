@@ -2,7 +2,7 @@ import sys
 from os import path, system
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from config import hosts
+#from config import hosts
 
 from kafka import KafkaConsumer
 from json import loads
@@ -18,7 +18,6 @@ import consul
 
 c = consul.Consul(host='54.152.246.15', port=8500)
 index = None
-
 index, data = c.kv.get('db_config', index=index)
 db_config = loads(data['Value'])
 conn = mariadb.connect(**db_config)
@@ -37,7 +36,9 @@ index, data = c.kv.get('aws_config', index=index)
 aws_config = loads(data['Value'])
 system('mkdir ~/.aws')
 with open('~/.aws/credentials', 'w') as f:
-    f.write(aws_config)
+    f.write('[default]\n')
+    f.write(f'aws_access_key_id={aws_config["aws_access_key_id"]}\n')
+    f.write(f'aws_secret_access_key={aws_config["aws_secret_access_key"]}\n')
 
 my_config = Config(
     region_name='us-east-1',
@@ -84,7 +85,6 @@ for message in consumer:
         )
         print(f'send {updated_time}, {stock_name} to {phone_number}')
         cursor.execute(alarm_delete_sql, [user_id, stock_id])
-        conn.commit()
 
 print('PROGRAM END')
 

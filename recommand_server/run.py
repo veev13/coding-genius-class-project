@@ -5,14 +5,9 @@ from json import loads
 import views
 
 app = Flask(__name__)
-
-app.config.update(Debug=True)
-
 api = Api(app)
 
-
 recommand = '/recommand'
-api.add_resource(views.Recommand, recommand )
+api.add_resource(views.Recommand, recommand)
 
-
-app.run(host='0.0.0.0', port=5000, debug=True)
+app.run(host='0.0.0.0', port=15003)
