@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: recommand-pod
+  labels:
+    app: recommand
+spec:
+  containers:
+  - name: recommand
+    image: boy0516/recommand:1.0
