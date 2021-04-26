@@ -37,7 +37,7 @@ aws_config = loads(data['Value'])
 system('mkdir ~/.aws')
 access_key = aws_config["aws_access_key_id"]
 secret_key = aws_config["aws_secret_access_key"]
-system('echo f"[default]\naws_access_key_id={access_key}\naws_secret_access_key={secret_key}" > ~/.aws/credentials')
+system(f'echo "[default]\naws_access_key_id={access_key}\naws_secret_access_key={secret_key}" > ~/.aws/credentials')
 
 my_config = Config(
     region_name='us-east-1',
