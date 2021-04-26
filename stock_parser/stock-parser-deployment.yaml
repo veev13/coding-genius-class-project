@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stockparser
+  labels:
+    app: stockparser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-echo
+  template:
+    metadata:
+      labels:
+        app: my-echo
+    spec:
+      containers:
+      - name: stockparser1
+        image: boy0516/stockparser1:1.5
+      - name: stockparser2
+        image: boy0516/stockparser2:1.4
+      - name: stockparser3
+        image: boy0516/stockparser3:1.4
+      - name: stockparser4
+        image: boy0516/stockparser4:1.4
+      - name: stockparser5
+        image: boy0516/stockparser5:1.4

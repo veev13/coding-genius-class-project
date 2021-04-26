@@ -10,10 +10,12 @@ import consul
 c = consul.Consul(host='54.152.246.15', port=8500)
 index = None
 
-index, data = c.kv.get('recommand_db_config', index=index)
-db_config = loads(data['Value'])
 
-conn = mariadb.connect(**db_config)
+index, data = c.kv.get('recommand_db_config', index=index)
+recommand_db_config = loads(data['Value'])
+
+
+conn = mariadb.connect(**recommand_db_config)
 cursor = conn.cursor()
 
 
