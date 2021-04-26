@@ -12,6 +12,7 @@ RUN pip3 install flask_jwt_extended
 RUN pip3 install requests
 RUN pip3 install mariadb
 RUN pip3 install pymysql
+RUN pip3 install python-consul
 
 CMD python runner.py ${RUN_FILE}
 
