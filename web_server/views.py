@@ -36,9 +36,9 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
 def get_stock_chart_data(stock_code):
     chart_res = requests.get(stock_server_host + f'/chart?code={stock_code}')
     if chart_res.status_code == 200:
-        return chart_res.json()['chart_data']
+        return chart_res.json()['chart_data'], chart_res.json()['chart_name']
     else:
-        return chart_res.json()['message']
+        return chart_res.json()['message'], "NULL"
 
 
 def get_stock_list():
@@ -61,20 +61,21 @@ def get_logged_in():
 
 @app.route('/')
 def main_page():
-    stock_name = '삼성전자'
-    stock_code = '005930'
+    recommand_res = requests.get(hosts.hosts.recommand_server_service + "/recommand")
+
+    stock_code = recommand_res.json()['max']
 
     values = {
-        'chart_name': stock_name,
         'logged_in': get_logged_in(),
         'stock_list': get_stock_list(),
     }
-    chart_data = get_stock_chart_data(stock_code)
+    chart_data, chart_name = get_stock_chart_data(stock_code)
     if not type(chart_data) == str:
         if len(chart_data) == 1:
             values['message'] = "데이터가 없습니다."
         else:
             values['chart_data'] = chart_data
+            values['chart_name'] = chart_name
     else:
         values['message'] = chart_data
     return render_template('index.html', values=values)
@@ -122,6 +123,22 @@ def my_page():
     return render_template('mypage.html', values=values)
 
 
+@app.route('/alarm', methods=['post'])
+def stock_alarm():
+    jwt = request.cookies.get("access_token_cookie")
+    json_data = request.form
+    headers = {
+        "Authorization": "Bearer " + (jwt if jwt else ""),
+    }
+    alarm_set_res = requests.post(stock_server_host + '/alarms', json=json_data, headers=headers)
+    if alarm_set_res.status_code == 201:
+        message = alarm_set_res.json()['message']
+    else:
+        message = "잘못된 접근입니다."
+
+    return render_template('message.html', message=message)
+
+
 @app.route('/stock')
 def stock_detail():
     stock = request.args.get('stock')
@@ -135,7 +152,7 @@ def stock_detail():
         'logged_in': get_logged_in(),
         'stock_list': get_stock_list(),
     }
-    chart_data = get_stock_chart_data(stock_code)
+    chart_data, chart_name = get_stock_chart_data(stock_code)
     if not type(chart_data) == str:
         if len(chart_data) == 1:
             values['message'] = "데이터가 없습니다."
@@ -226,7 +243,6 @@ def signup():
     if request.method == 'POST':
         json_data = request.form
         response = requests.post(login_server + '/signup', json=json_data)
+        print(response.json())
         message = response.json()['message']
-        if message:
-            return render_template('signup.html', message=message)
-        return login(signup=True)
+        return render_template('message.html', message=message)

@@ -1,16 +1,18 @@
+import requests
 import pymysql
+from datetime import datetime, timedelta
+import threading
+import time
+from json import dumps
+from json import loads
+import consul
 
-weather_data = [20, 10, 0, 25, 30, 1, 2, 3, 4, 5]
-stock_ids = ['207940','068270','051910','035720','035420','006400','005930','005490','005380','000660']
-Time = []
+# consul kv 받아오기
+c = consul.Consul(host='54.152.246.15', port=8500)
+index = None
 
-for i in range(5):
-    Time.append("{:%Y-%m-%d-%H}-00".format(datetime.now()-timedelta(hours=i)))
-
-
-url="SELECT stock_id, trade_price FROM StockInfos WHERE updated_time IN ('2021-04-19-15-58','2021-04-19-15-57','2021-04-19-15-56','2021-04-19-15-55','2021-04-19-15-54')"
-
-
+index, data = c.kv.get('recommand_db_config', index=index)
+recommand_db_config = loads(data['Value'])
 
 def weather_sort(weather):
     # 리스트 두 개 받아서 짜기(날씨데이터 5개, 주식데이터 5개)
@@ -33,7 +35,7 @@ def weather_sort(weather):
             prev = weather_list[index]
             pre = weather_list[index+1]
             rate = ((prev - pre) / prev)*100
-            weather_rate.append(rate)
+            weather_rate.append(round(rate,2))
 
         except:
             break
@@ -41,7 +43,7 @@ def weather_sort(weather):
     return weather_rate
 
 
-def stock_sort(stock_id, price_list):
+def stock_sort(price_list):
     price_re = []
     for index in price_list:
         price_re.append(index)
@@ -52,35 +54,27 @@ def stock_sort(stock_id, price_list):
             prev = price_re[i]
             pre = price_re[i+1]
             rate = ((prev - pre) / prev)*100
-            price_rate.append(rate)
+            price_rate.append(round(rate,2))
 
         except:
             break
 
-    print(price_rate)
+    print(price_rate,'a')
     return price_rate
 
 
 def recommand(weather_rate, price_rate):
     similarity = 0
     for idx in range(len(price_rate)):
-        similarity = weather_rate[idx] - price_rate[idx]
+        similarity += abs(weather_rate[idx] - price_rate[idx])
     similarity = round(similarity, 2)
     return similarity
 
 
-<<<<<<< HEAD
-def insert_rec(stock_id, similarity):
-    db_config = None
-    with open('../config/db_config.txt', 'r') as file:
-        db_config_string = file.read()
-        db_config = loads(db_config_string)
-=======
-def insert_rec(stock_code, total):
-    db_config=loads(requests.get('http://http://3.237.78.43:30500//v1/kv/db_config?raw').text)
->>>>>>> develop
 
-    conn = pymysql.connect(**db_config)
+def insert_rec(stock_id, similarity):
+    
+    conn = pymysql.connect(**recommand_db_config)
     cursor = conn.cursor()
 
  
@@ -93,6 +87,43 @@ def insert_rec(stock_code, total):
     conn.commit()
     print('query added')
     conn.close()
+
+def recommand_do():
+    url = "SELECT temp FROM Weathers order by rand() LIMIT 5"
+    con = pymysql.connect(**recommand_db_config)
+    cur = con.cursor()
+    cur.execute(url)
+    weather=[]    ### 중요한거     
+    weather_data = cur.fetchall()
+    for temps in weather_data:
+        weather.append(temps[0])
+
+
+    for stock_id in range(1,6):
+        price_list=[]
+        url = "SELECT trade_price FROM StockInfos Where stock_id={} order by rand() LIMIT 5".format(stock_id)
+        cur.execute(url)
+        price_data = cur.fetchall()
+        for price in price_data:
+            price_list.append(price[0])
+
+        insert_rec(stock_id, recommand(weather_sort(weather),stock_sort(price_list)))
+
+
+# 쓰레드를 통해 반복 실행
+def thread_parser(next_call_in):
+    next_call_in += 3600*24
+    
+    recommand_do()
+    print('thread_parser running')
+    threading.Timer(next_call_in - time.time(),
+                    thread_parser,
+                    [next_call_in]).start()
+
+
+next_call_in = time.time()
+thread_parser(next_call_in)
+
 
 
 

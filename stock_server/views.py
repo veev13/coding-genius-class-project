@@ -24,23 +24,27 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
 
 def get_stock_id_by_stock_code(stock_code):
     # Stock Code to Stock ID
-    sql = "SELECT stock_id " \
+    sql = "SELECT stock_id, stock_name " \
           "FROM Stocks " \
           "WHERE stock_code = ?"
     cursor.execute(sql, [stock_code])
-    return get_fetchone_or_404()
+    try:
+        return cursor.fetchone()
+    except:
+        return Response(dumps({"message": "존재하지 않는 종목입니다."}), status=404, mimetype='application/json'), "NULL"
 
 
 class StockChartData(Resource):
     def get(self):
         stock_code = request.args.get('code')
-        stock_id = get_stock_id_by_stock_code(stock_code)
+        stock_id, stock_name = get_stock_id_by_stock_code(stock_code)
         if type(stock_id) is wrappers.Response:
             return Response(dumps({"message": "존재하지 않는 종목입니다."}), status=404, mimetype='application/json')
         sql = """
                     SELECT updated_time,trade_price 
                     FROM StockInfos 
-                    WHERE stock_id = %s
+                    WHERE stock_id = %s 
+                    ORDER BY updated_time
                     """
         cursor.execute(sql, [stock_id])
         result = cursor.fetchall()
@@ -52,18 +56,20 @@ class StockChartData(Resource):
             result_data.append(data)
 
         chart_data = [['날짜', '거래가']] + result_data
-        return Response(dumps({"chart_data": chart_data}), status=200, mimetype='application/json')
+        return Response(dumps({"chart_data": chart_data,
+                               "chart_name": stock_name,
+                               }), status=200, mimetype='application/json')
 
 
 class StockBuy(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
         stock_code = json_data['stock_code']
         buy_count = int(json_data['count'])
 
-        stock_id = get_stock_id_by_stock_code(stock_code)
+        stock_id, stock_name = get_stock_id_by_stock_code(stock_code)
         if type(stock_id) is wrappers.Response:
             return stock_id
 
@@ -110,7 +116,7 @@ class StockBuy(Resource):
 
 
 class StockSell(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -158,7 +164,7 @@ class StockSell(Resource):
 
 # 보유 종목 조회 API
 class StockStatus(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT stock_code, stock_name, feature, owning_numbers " \
@@ -176,7 +182,7 @@ class StockStatus(Resource):
 
 # 유저 보유 포인트 조회 API
 class UserPoint(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT user_id, login_id, point " \
@@ -191,11 +197,17 @@ class UserPoint(Resource):
 
 # 알람 설정 API
 class StockAlarms(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
-        stock_id = json_data['stock_id']
+        stock_code = json_data['stock_code']
+        sql = "SELECT stock_id FROM Stocks WHERE stock_code = ?"
+        cursor.execute(sql, [stock_code])
+        stock_id = get_fetchone_or_404("존재하지 않는 종목입니다.")
+        if type(stock_id) is wrappers.Response:
+            return stock_id
+
         price = json_data['price']
         condition_type = json_data['condition_type']
 
@@ -214,7 +226,7 @@ class StockAlarms(Resource):
             cursor.execute(sql, [price, condition_type, user_id, stock_id])
             conn.commit()
 
-        return Response(dumps({"message": "success"}), status=201, mimetype='application/json')
+        return Response(dumps({"message": "알람이 설정되었습니다."}), status=201, mimetype='application/json')
 
 
 # 주식 목록 조회 API
