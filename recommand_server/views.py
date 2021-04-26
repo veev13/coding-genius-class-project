@@ -10,16 +10,16 @@ import consul
 c = consul.Consul(host='54.152.246.15', port=8500)
 index = None
 
-index, data = c.kv.get('recommand_db_config', index=index)
-db_config = loads(data['Value'])
 
-conn = mariadb.connect(**db_config)
+index, data = c.kv.get('recommand_db_config', index=index)
+recommand_db_config = loads(data['Value'])
+
+
+conn = mariadb.connect(**recommand_db_config)
 cursor = conn.cursor()
 
 
 # 추천 종목 API
-
-
 class Recommand(Resource):
     def get(self):
         # max = """
@@ -32,7 +32,7 @@ class Recommand(Resource):
             "SELECT stock_code " \
             "FROM Recommands JOIN Stocks " \
             "WHERE Recommands.stock_id = Stocks.stock_id AND " \
-            "similarity=" \
+            "similarity >=" \
             "(SELECT MAX(similarity) FROM Recommands ORDER BY recommand_time DESC LIMIT 10)"
 
         cursor.execute(max)
