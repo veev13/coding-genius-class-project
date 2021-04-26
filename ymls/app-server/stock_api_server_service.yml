@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2021-04-25T05:53:56Z"
+  name: stock-api-server-service
+  namespace: default
+  resourceVersion: "181837"
+  uid: abeb84bd-3f56-45a4-98fb-1fef049562bb
+spec:
+  clusterIP: 100.68.231.54
+  clusterIPs:
+  - 100.68.231.54
+  ports:
+  - port: 15002
+    protocol: TCP
+    targetPort: 15002
+  selector:
+    run: webserver
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

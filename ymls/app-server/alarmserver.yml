@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alarmserver-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: alarmserver
+  template:
+    metadata:
+      labels:
+        run: alarmserver
+    spec:
+      containers:
+      - name: kafka-consumer
+        env: 
+        - name: RUN_FILE
+          value: "/server/coding-genius-class-project.git/alarm_server/run.py"
+        image: veev23/kafka-boto3-alarmserver:1.0
+        imagePullPolicy: Always
+        # command: ['sleep', '60000']
+        volumeMounts:
+          - name: git-volume
+            mountPath: "/server"
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.1
+        env:
+        - name: GIT_SYNC_REPO                 # git sync할 리모트 저장소
+          value: https://github.com/veev13/coding-genius-class-project.git
+        - name: GIT_SYNC_BRANCH               # target branch
+          value: develop
+        - name: GIT_SYNC_ROOT                 # 로컬 디렉토리 위치
+          value: "/git"
+        volumeMounts:
+        - name: git-volume
+          mountPath: "/git"
+      volumes:
+        - name: git-volume
+          emptyDir: {}

@@ -1,0 +1,16 @@
+# Dockerfile
+
+FROM python
+
+ENV RUN_FILE 0
+COPY ./runner.py ./runner.py
+
+RUN pip3 install --upgrade pip
+RUN pip3 install boto3
+RUN pip3 install kafka-python
+RUN pip3 install mariadb
+RUN pip3 install python-consul
+RUN pip3 install awscli
+
+CMD python runner.py ${RUN_FILE}
+
