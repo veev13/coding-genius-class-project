@@ -66,11 +66,25 @@ spec:
         resources: {}
         volumeMounts:
         - mountPath: /etc/kafka-connect/jars
-          name: kafka-connector-mysql-claim0
+          name: git-volume
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.1
+        env:
+        - name: GIT_SYNC_REPO                 # git sync할 리모트 저장소
+          value: https://github.com/veev13/coding-genius-class-project/ymls/jars.git
+        - name: GIT_SYNC_BRANCH               # target branch
+          value: develop
+        - name: GIT_SYNC_ROOT                 # 로컬 디렉토리 위치
+          value: "/git"
+        volumeMounts:
+        - name: git-volume
+          mountPath: "/git"
       restartPolicy: Always
       serviceAccountName: ""
       volumes:
-      - name: kafka-connector-mysql-claim0
-        persistentVolumeClaim:
-          claimName: kafka-connector-mysql-claim0
+        - name: git-volume
+          emptyDir: {}
+        
+
+          
 status: {}
