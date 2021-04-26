@@ -8,6 +8,8 @@ from kafka import KafkaConsumer
 from json import loads
 
 print('PROGRAM START')
+import time
+import boto3
 import mariadb
 import boto3
 from botocore.config import Config
@@ -21,13 +23,13 @@ db_config = loads(data['Value'])
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 
-# consumer = KafkaConsumer('StockInfos',
-#                          bootstrap_servers=[hosts.hosts.kafka_bootstrap_server_service],
-#                          auto_offset_reset='earlist',
-#                          enable_auto_commit=True,
-#                          group_id='my-group',
-#                          value_deserializer=lambda x: loads(x.decode('utf-8')),
-#                          )
+consumer = KafkaConsumer('StockInfos',
+                         bootstrap_servers=[hosts.hosts.kafka_bootstrap_server_service],
+                         auto_offset_reset='earlist',
+                         enable_auto_commit=True,
+                         group_id='my-group',
+                         value_deserializer=lambda x: loads(x.decode('utf-8')),
+                         )
 
 index = None
 index, data = c.kv.get('aws_config', index=index)
@@ -35,7 +37,7 @@ aws_config = loads(data['Value'])
 system('mkdir ~/.aws')
 access_key = aws_config["aws_access_key_id"]
 secret_key = aws_config["aws_secret_access_key"]
-system('echo f"[default]\naws_access_key_id={access_key}\naws_secret_access_key={secret_key}" > ~/.aws/credentials')
+system(f'echo "[default]\naws_access_key_id={access_key}\naws_secret_access_key={secret_key}" > ~/.aws/credentials')
 
 my_config = Config(
     region_name='us-east-1',
@@ -74,10 +76,10 @@ for message in consumer:
     for user_id, phone_number in result_set:
         response = client.publish(
             PhoneNumber=phone_number,
-            Message=f'[{updated_time}]{stock_name} 주식의 가격이 {trade_price}입니다.',
+            Message=f'[내일은 투자왕:{updated_time}]{stock_name} 주가 {trade_price}입니다.',
         )
         print(f'send {updated_time}, {stock_name} to {phone_number}')
         cursor.execute(alarm_delete_sql, [user_id, stock_id])
+        conn.commit()
 
 print('PROGRAM END')
-
