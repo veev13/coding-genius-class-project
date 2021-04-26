@@ -29,7 +29,7 @@
         {% else %}
     <form action="{{url_for('stock_sell')}}" method="post">
         {% endif %}
-        <input type="hidden" name="stock_id" value="{{values.stock_id}}"/>
+        <input type="hidden" name="stock_code" value="{{values.stock_code}}"/>
     <p>종목명</p>
     <p>{{values.stock_name}}</p>
     <p>{{values.trade_type}} 가격</p>

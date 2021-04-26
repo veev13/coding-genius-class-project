@@ -3,18 +3,17 @@ from flask_restful import Api
 from flask_jwt_extended import *
 from json import loads
 import views
-import requests
+import consul
 
 app = Flask(__name__)
 
-
-
-jwt_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/jwt_config?raw').text)
-
+c = consul.Consul(host='54.152.246.15', port=8500)
+index = None
+index, data = c.kv.get('jwt_config', index=index)
+jwt_config = loads(data['Value'])
 
 app.config.update(jwt_config)
 jwt = JWTManager(app)
-
 
 api = Api(app)
 
@@ -23,4 +22,4 @@ api.add_resource(views.Login, login)
 signup = '/signup'
 api.add_resource(views.SignUp, signup)
 
-app.run(host='0.0.0.0', port=5001, debug=True)
+app.run(host='0.0.0.0', port=15001)

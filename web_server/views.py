@@ -4,18 +4,26 @@ import requests
 from __init__ import app
 from flask_jwt_extended import *
 import pymysql
-import re
+import consul
 
+import sys
+from os import path
 
-db_config = loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from config import hosts
 
+c = consul.Consul(host='54.152.246.15', port=8500)
+index = None
+
+index, data = c.kv.get('db_config', index=index)
+db_config = loads(data['Value'])
 conn = pymysql.connect(**db_config)
 cursor = conn.cursor()
 app.config["JSON_AS_ASCII"] = False
 
-stock_server_host = 'http://127.0.0.1:5000/stocks'
-user_server_host = 'http://127.0.0.1:5000/users'
-login_server = "http://localhost:5001"
+stock_server_host = hosts.hosts.stock_server_service
+user_server_host = hosts.hosts.users_server_service
+login_server = hosts.hosts.login_server_service
 
 
 def get_fetchone_or_404(error_message="잘못된 요청입니다."):
@@ -26,22 +34,11 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
 
 
 def get_stock_chart_data(stock_code):
-    sql = """
-            SELECT updated_time,trade_price 
-            FROM StockInfos 
-            WHERE stock_id = %s
-            """
-    cursor.execute(sql, [stock_code])
-    result = cursor.fetchall()
-    result_data = []
-    for a in result:
-        data = []
-        for b in a:
-            data.append(b)
-        result_data.append(data)
-
-    chart_data = [['날짜', '거래가']] + result_data
-    return chart_data
+    chart_res = requests.get(stock_server_host + f'/chart?code={stock_code}')
+    if chart_res.status_code == 200:
+        return chart_res.json()['chart_data']
+    else:
+        return chart_res.json()['message']
 
 
 def get_stock_list():
@@ -66,11 +63,20 @@ def get_logged_in():
 def main_page():
     stock_name = '삼성전자'
     stock_code = '005930'
-    values = {'chart_data': get_stock_chart_data(stock_code),
-              'chart_name': stock_name,
-              'logged_in': get_logged_in(),
-              'stock_list': get_stock_list(),
-              }
+
+    values = {
+        'chart_name': stock_name,
+        'logged_in': get_logged_in(),
+        'stock_list': get_stock_list(),
+    }
+    chart_data = get_stock_chart_data(stock_code)
+    if not type(chart_data) == str:
+        if len(chart_data) == 1:
+            values['message'] = "데이터가 없습니다."
+        else:
+            values['chart_data'] = chart_data
+    else:
+        values['message'] = chart_data
     return render_template('index.html', values=values)
 
 
@@ -97,9 +103,10 @@ def my_page():
         'stock_list': get_stock_list(),
     }
     headers = {
-        "Authorization": "Bearer " + jwt,
+        "Authorization": "Bearer " + (jwt if jwt else ""),
     }
-    my_stock_list_res = requests.get(user_server_host + '/stocks', headers=headers)
+    my_stock_list_res = requests.get(
+        user_server_host + '/stocks', headers=headers)
     values['my_stocks'] = []
     if my_stock_list_res.status_code == 200:
         my_stock_list = my_stock_list_res.json()
@@ -123,25 +130,32 @@ def stock_detail():
     stock_name = stock[:bungi]
     stock_code = stock[bungi + 1:-1]
     values = {
-        'chart_data': get_stock_chart_data(stock_code),
         'chart_name': stock_name,
         'chart_code': stock_code,
         'logged_in': get_logged_in(),
         'stock_list': get_stock_list(),
     }
+    chart_data = get_stock_chart_data(stock_code)
+    if not type(chart_data) == str:
+        if len(chart_data) == 1:
+            values['message'] = "데이터가 없습니다."
+        else:
+            values['chart_data'] = chart_data
+    else:
+        values['message'] = chart_data
     return render_template('stock.html', values=values)
 
 
 @app.route('/stock/sell', methods=['get', 'post'])
 def stock_sell():
-    stock_id = request.args.get('id')
+    stock_code = request.args.get('code')
     stock_name = request.args.get('name')
     stock_price = request.args.get('price')
     if request.method == 'GET':
         values = {
             'trade_type': "매도",
             'stock_name': stock_name,
-            'stock_id': stock_id,
+            'stock_code': stock_code,
             'trade_price': stock_price,
             'stock_list': get_stock_list(),
         }
@@ -150,24 +164,25 @@ def stock_sell():
         jwt = request.cookies.get("access_token_cookie")
         get_logged_in()
         headers = {
-            "Authorization": "Bearer " + jwt,
+            "Authorization": "Bearer " + (jwt if jwt else ""),
         }
         json_data = request.form
-        trade_res = requests.post(stock_server_host + '/sell', json=json_data, headers=headers)
+        trade_res = requests.post(
+            stock_server_host + '/sell', json=json_data, headers=headers)
         message = trade_res.json()['message']
         return render_template('trade_ok.html', message=message)
 
 
 @app.route('/stock/buy', methods=['get', 'post'])
 def stock_buy():
-    stock_id = request.args.get('id')
+    stock_code = request.args.get('code')
     stock_name = request.args.get('name')
     stock_price = request.args.get('price')
     if request.method == 'GET':
         values = {
             'trade_type': "매수",
             'stock_name': stock_name,
-            'stock_id': stock_id,
+            'stock_code': stock_code,
             'trade_price': stock_price,
             'stock_list': get_stock_list(),
         }
@@ -176,10 +191,11 @@ def stock_buy():
         jwt = request.cookies.get("access_token_cookie")
         get_logged_in()
         headers = {
-            "Authorization": "Bearer " + jwt,
+            "Authorization": "Bearer " + (jwt if jwt else ""),
         }
         json_data = request.form
-        trade_res = requests.post(stock_server_host + '/buy', json=json_data, headers=headers)
+        trade_res = requests.post(
+            stock_server_host + '/buy', json=json_data, headers=headers)
         message = trade_res.json()['message']
         return render_template('trade_ok.html', message=message)
 
@@ -192,7 +208,8 @@ def login(signup=False):
         if login_res.status_code != 200:
             return render_template('login.html', signup=signup, token=None)
         jwt = login_res.headers['token']
-        response = make_response(render_template('login.html', signup=signup, token=jwt))
+        response = make_response(render_template(
+            'login.html', signup=signup, token=jwt))
         response.set_cookie("access_token_cookie", jwt)
         return response
 

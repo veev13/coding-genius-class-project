@@ -1,0 +1,41 @@
+{
+	"name" : "stock_sink_connect",
+	"config" : {
+		"connector.class" : "io.confluent.connect.jdbc.JdbcSinkConnector",
+		"connection.url": "jdbc:mysql://wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com/multicampus",
+		"connection.user":"admin",
+		"connection.password":"asdf555!",
+		"delete.enabled":"false",
+		"tasks.max":"1",
+		"topics":"StockInfos"
+	}
+}
+
+
+
+# 토픽생성
+bin\windows\kafka-topics.bat --create --topic StockInfos --bootstrap-server localhost:9092
+
+# 싱크 생성
+echo '{"name" : "stock_sink_connect","config" : {"connector.class" : "io.confluent.connect.jdbc.JdbcSinkConnector","connection.url": "jdbc:mysql://wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com/multicampus","connection.user":"admin","connection.password":"asdf555!","delete.enabled":"false","tasks.max":"1","topics":"StockInfos"}}' | curl -X POST -d @- http://localhost:8083/connectors --header "content-Type:application/json"
+
+
+echo '
+{
+	"name" : "stock_sink_connect",
+	"config" : {
+		"connector.class" : "io.confluent.connect.jdbc.JdbcSinkConnector",
+		"connection.url": "jdbc:mysql://wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com/multicampus",
+		"connection.user":"admin",
+		"connection.password":"asdf555!",
+		"delete.enabled":"false",
+		"tasks.max":"1",
+		"topics":"StockInfos"
+	}
+}
+' | curl -X POST -d '{"name" : "stock_sink_connect","config" : {"connector.class" : "io.confluent.connect.jdbc.JdbcSinkConnector","connection.url": "jdbc:mysql://wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com/multicampus","connection.user":"admin","connection.password":"asdf555!","delete.enabled":"false","tasks.max":"1","topics":"StockInfos"}}' http://localhost:8083/connectors --header "content-Type:application/json"
+
+
+curl -X POST -d '{"name" : "stock_sink_connect","config" : {"connector.class" : "io.confluent.connect.jdbc.JdbcSinkConnector","connection.url": "jdbc:mysql://wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com/multicampus","connection.user":"admin","connection.password":"asdf555!","delete.enabled":"false","tasks.max":"1","topics":"StockInfos"}}' http://127.0.0.1:8083/connectors --header "content-Type:application/json"
+
+curl -X POST -d "{""name"" : ""stock_sink_connect"",""config"" : {""connector.class"" : ""io.confluent.connect.jdbc.JdbcSinkConnector"",""connection.url"": ""jdbc:mysql://wth-stk-svc.chik9zpsmeh8.us-east-1.rds.amazonaws.com/multicampus"",""connection.user"":""admin"",""connection.password"":""asdf555!"",""delete.enabled"":""false"",""tasks.max"":""1"",""topics"":""StockInfos""}}" http://127.0.0.1:8083/connectors --header "content-Type:application/json"

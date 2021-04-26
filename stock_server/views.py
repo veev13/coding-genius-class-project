@@ -3,9 +3,14 @@ from flask import Response, jsonify, request, wrappers
 from flask_restful import Resource, Api
 from flask_jwt_extended import *
 import mariadb
-import requests
+import consul
 
-db_config=loads(requests.get('http://3.237.78.43:30500/v1/kv/db_config?raw').text)
+c = consul.Consul(host='54.152.246.15', port=8500)
+index = None
+
+index, data = c.kv.get('db_config', index=index)
+db_config = loads(data['Value'])
+
 conn = mariadb.connect(**db_config)
 cursor = conn.cursor()
 
@@ -17,18 +22,50 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
         return Response(dumps({"message": error_message}), status=404, mimetype='application/json')
 
 
-class Test(Resource):
+def get_stock_id_by_stock_code(stock_code):
+    # Stock Code to Stock ID
+    sql = "SELECT stock_id " \
+          "FROM Stocks " \
+          "WHERE stock_code = ?"
+    cursor.execute(sql, [stock_code])
+    return get_fetchone_or_404()
+
+
+class StockChartData(Resource):
     def get(self):
-        return Response(dumps({"token": create_access_token(identity=1)}), status=200, mimetype='application/json')
+        stock_code = request.args.get('code')
+        stock_id = get_stock_id_by_stock_code(stock_code)
+        if type(stock_id) is wrappers.Response:
+            return Response(dumps({"message": "존재하지 않는 종목입니다."}), status=404, mimetype='application/json')
+        sql = """
+                    SELECT updated_time,trade_price 
+                    FROM StockInfos 
+                    WHERE stock_id = %s
+                    """
+        cursor.execute(sql, [stock_id])
+        result = cursor.fetchall()
+        result_data = []
+        for a in result:
+            data = []
+            for b in a:
+                data.append(b)
+            result_data.append(data)
+
+        chart_data = [['날짜', '거래가']] + result_data
+        return Response(dumps({"chart_data": chart_data}), status=200, mimetype='application/json')
 
 
 class StockBuy(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
-        stock_id = json_data['stock_id']
+        stock_code = json_data['stock_code']
         buy_count = int(json_data['count'])
+
+        stock_id = get_stock_id_by_stock_code(stock_code)
+        if type(stock_id) is wrappers.Response:
+            return stock_id
 
         # 보유 포인트 확인
         get_user_point_sql = "SELECT point " \
@@ -56,12 +93,14 @@ class StockBuy(Resource):
             try:
                 own_stock_insert_sql = "INSERT INTO Users_Stock(user_id, stock_id, owning_numbers) " \
                                        "VALUES(?, ?, ?)"
-                cursor.execute(own_stock_insert_sql, [user_id, stock_id, buy_count])
+                cursor.execute(own_stock_insert_sql, [
+                    user_id, stock_id, buy_count])
             except:
                 own_stock_update_sql = "UPDATE Users_Stock " \
                                        "SET owning_numbers = owning_numbers + ? " \
                                        "WHERE user_id = ? AND stock_id = ?"
-                cursor.execute(own_stock_update_sql, [buy_count, user_id, stock_id])
+                cursor.execute(own_stock_update_sql, [
+                    buy_count, user_id, stock_id])
             conn.commit()
             return Response(dumps({"message": f"거래가 완료되었습니다. 현재 보유 포인트: {point - pay}"}), status=201,
                             mimetype='application/json')
@@ -71,12 +110,16 @@ class StockBuy(Resource):
 
 
 class StockSell(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
-        stock_id = json_data['stock_id']
+        stock_code = json_data['stock_code']
         sell_count = int(json_data['count'])
+
+        stock_id = get_stock_id_by_stock_code(stock_code)
+        if type(stock_id) is wrappers.Response:
+            return stock_id
 
         get_own_count_sql = "SELECT owning_numbers " \
                             "FROM Users_Stock " \
@@ -115,10 +158,10 @@ class StockSell(Resource):
 
 # 보유 종목 조회 API
 class StockStatus(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
-        sql = "SELECT Users_Stock.stock_id, stock_name, feature, owning_numbers " \
+        sql = "SELECT stock_code, stock_name, feature, owning_numbers " \
               "FROM Users_Stock JOIN Stocks " \
               "WHERE user_id = ? AND Users_Stock.stock_id = Stocks.stock_id"
         cursor.execute(sql, [user_id])
@@ -133,7 +176,7 @@ class StockStatus(Resource):
 
 # 유저 보유 포인트 조회 API
 class UserPoint(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         sql = "SELECT user_id, login_id, point " \
@@ -148,7 +191,7 @@ class UserPoint(Resource):
 
 # 알람 설정 API
 class StockAlarms(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
@@ -163,7 +206,7 @@ class StockAlarms(Resource):
             cursor.execute(sql, [user_id, stock_id, price, condition_type])
             conn.commit()
 
-        # 이미 설정된 종목을 다시 설정할 때 예외처리 
+        # 이미 설정된 종목을 다시 설정할 때 예외처리
         except mariadb.IntegrityError:
             sql = "UPDATE Alarms " \
                   "SET price = ?, condition_type = ? " \

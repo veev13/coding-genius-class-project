@@ -86,7 +86,7 @@
     function setStockList(datalist) {
         var stock_list = values.stock_list;
         for (let i in stock_list) {
-            datalist.innerHTML += "<option value='" + stock_list[i].stock_name + "[" + stock_list[i].stock_id + "]'>"
+            datalist.innerHTML += "<option value='" + stock_list[i].stock_name + "[" + stock_list[i].stock_code + "]'>"
         }
     }
     datalist = document.getElementById("stock_list");

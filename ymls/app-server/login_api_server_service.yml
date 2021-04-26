@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2021-04-25T07:56:57Z"
+  name: login-api-server-service
+  namespace: default
+  resourceVersion: "198807"
+  uid: 36e44349-a8e3-4782-b023-2dba278ff2be
+spec:
+  clusterIP: 100.70.114.247
+  clusterIPs:
+  - 100.70.114.247
+  ports:
+  - port: 15001
+    protocol: TCP
+    targetPort: 15001
+  selector:
+    run: webserver
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

@@ -1,0 +1,18 @@
+# Dockerfile
+
+FROM python
+
+ENV RUN_FILE 0
+COPY ./runner.py ./runner.py
+
+RUN pip3 install --upgrade pip
+RUN pip3 install flask
+RUN pip3 install flask_restful
+RUN pip3 install flask_jwt_extended
+RUN pip3 install requests
+RUN pip3 install mariadb
+RUN pip3 install pymysql
+RUN pip3 install python-consul
+
+CMD python runner.py ${RUN_FILE}
+

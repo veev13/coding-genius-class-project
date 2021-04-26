@@ -1,6 +1,5 @@
 config/*.txt
 
-
 # Created by https://www.toptal.com/developers/gitignore/api/windows,python,vscode,pycharm,flask
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,python,vscode,pycharm,flask
 
@@ -364,3 +363,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,python,vscode,pycharm,flask
+>>>>>>> 182340944490231ca483ec554ee76d99bde910a0
