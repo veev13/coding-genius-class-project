@@ -84,6 +84,7 @@ for message in consumer:
         )
         print(f'send {updated_time}, {stock_name} to {phone_number}')
         cursor.execute(alarm_delete_sql, [user_id, stock_id])
+        conn.commit()
 
 print('PROGRAM END')
 
