@@ -27,14 +27,16 @@ class SignUp(Resource):
         json_data = request.get_json()
         login_id = json_data['id']
         login_pwd = json_data['pwd']
-        sql = "INSERT INTO Users(login_id, login_password) " \
-              "VALUES(?, ?)"
+        email = json_data['email']
+        sql = "INSERT INTO Users(login_id, login_password, email) " \
+              "VALUES(?, ?, ?)"
         try:
-            cursor.execute(sql, [login_id, login_pwd])
+            cursor.execute(sql, [login_id, login_pwd, email])
             conn.commit()
         except mariadb.IntegrityError:
             return Response(dumps({"message": "만들 수 없는 아이디입니다."}), status=200, mimetype='application/json')
         response_data = {
+            "message": "생성되었습니다.",
             'login_id': login_id
         }
         return Response(dumps(response_data), status=201, mimetype='application/json')

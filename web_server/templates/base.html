@@ -43,7 +43,7 @@
                 </li>
             </ul>
             {% if not values.logged_in %}
-            <form class="form-inline my-2 my-lg-0" action="/login" method="post">
+            <form class="form-inline my-2 my-lg-0" id='login' action="/login" method="post">
                 {% else %}
                 <form class="form-inline my-2 my-lg-0" action="/logout" method="post">
                     {% endif %}
@@ -54,7 +54,21 @@
                     <input class="form-control"
                         style="border-radius:30px;margin-right:20px;border:solid rgba(0,0,0,0) 3px;" name="pwd"
                         type="password" value="" placeholder="PASSWORD">
-                    <button class="btn btn-success" type="submit">로그인</button>
+                    <input class="form-control"
+                        style="border-radius:30px;margin-right:20px;border:solid rgba(0,0,0,0) 3px;" name="email"
+                        type="text" value="" placeholder="PHONE NUMBER">
+                    <button class="btn btn-success" style="margin-right:20px;" onclick="login()">로그인</button>
+                    <button class="btn btn-success" onclick="signup()">회원가입</button>
+                    <script>
+                        var login_form = document.getElementById("login");
+                        function login(){
+                        login_form.submit();
+                        }
+                        function signup(){
+                        login_form.action = '/signup';
+                        login_form.submit();
+                        }
+                    </script>
                     {% else %}
                     <button class="btn btn-success" type="submit">로그아웃</button>
                     {% endif %}

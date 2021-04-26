@@ -24,23 +24,27 @@ def get_fetchone_or_404(error_message="잘못된 요청입니다."):
 
 def get_stock_id_by_stock_code(stock_code):
     # Stock Code to Stock ID
-    sql = "SELECT stock_id " \
+    sql = "SELECT stock_id, stock_name " \
           "FROM Stocks " \
           "WHERE stock_code = ?"
     cursor.execute(sql, [stock_code])
-    return get_fetchone_or_404()
+    try:
+        return cursor.fetchone()
+    except:
+        return Response(dumps({"message": "존재하지 않는 종목입니다."}), status=404, mimetype='application/json'), "NULL"
 
 
 class StockChartData(Resource):
     def get(self):
         stock_code = request.args.get('code')
-        stock_id = get_stock_id_by_stock_code(stock_code)
+        stock_id, stock_name = get_stock_id_by_stock_code(stock_code)
         if type(stock_id) is wrappers.Response:
             return Response(dumps({"message": "존재하지 않는 종목입니다."}), status=404, mimetype='application/json')
         sql = """
                     SELECT updated_time,trade_price 
                     FROM StockInfos 
-                    WHERE stock_id = %s
+                    WHERE stock_id = %s 
+                    ORDER BY updated_time
                     """
         cursor.execute(sql, [stock_id])
         result = cursor.fetchall()
@@ -52,7 +56,9 @@ class StockChartData(Resource):
             result_data.append(data)
 
         chart_data = [['날짜', '거래가']] + result_data
-        return Response(dumps({"chart_data": chart_data}), status=200, mimetype='application/json')
+        return Response(dumps({"chart_data": chart_data,
+                               "chart_name": stock_name,
+                               }), status=200, mimetype='application/json')
 
 
 class StockBuy(Resource):
@@ -63,7 +69,7 @@ class StockBuy(Resource):
         stock_code = json_data['stock_code']
         buy_count = int(json_data['count'])
 
-        stock_id = get_stock_id_by_stock_code(stock_code)
+        stock_id, stock_name = get_stock_id_by_stock_code(stock_code)
         if type(stock_id) is wrappers.Response:
             return stock_id
 
