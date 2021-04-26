@@ -2,7 +2,7 @@ import sys
 from os import path, system
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-#from config import hosts
+from config import hosts
 
 from kafka import KafkaConsumer
 from json import loads
@@ -62,10 +62,6 @@ alarm_delete_sql = 'DELETE FROM Alarms ' \
                    'WHERE user_id = ? AND stock_id = ?'
 print('ITERATION START')
 for message in consumer:
-    # topic = message.topic
-    # partition = message.partition
-    # offset = message.offset
-    # key = message.key
     value = message.value
     payload = value['payload']
     stock_id = payload['stock_id']
@@ -81,7 +77,7 @@ for message in consumer:
     for user_id, phone_number in result_set:
         response = client.publish(
             PhoneNumber=phone_number,
-            Message=f'[{updated_time}]{stock_name} 주식의 가격이 {trade_price}입니다.',
+            Message=f'[내일은 투자왕:{updated_time}]{stock_name} 주가 {trade_price}입니다.',
         )
         print(f'send {updated_time}, {stock_name} to {phone_number}')
         cursor.execute(alarm_delete_sql, [user_id, stock_id])

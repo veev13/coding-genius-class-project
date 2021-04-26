@@ -201,7 +201,13 @@ class StockAlarms(Resource):
     def post(self):
         json_data = request.get_json()
         user_id = get_jwt_identity()
-        stock_id = json_data['stock_id']
+        stock_code = json_data['stock_code']
+        sql = "SELECT stock_id FROM Stocks WHERE stock_code = ?"
+        cursor.execute(sql, [stock_code])
+        stock_id = get_fetchone_or_404("존재하지 않는 종목입니다.")
+        if type(stock_id) is wrappers.Response:
+            return stock_id
+
         price = json_data['price']
         condition_type = json_data['condition_type']
 
@@ -220,7 +226,7 @@ class StockAlarms(Resource):
             cursor.execute(sql, [price, condition_type, user_id, stock_id])
             conn.commit()
 
-        return Response(dumps({"message": "success"}), status=201, mimetype='application/json')
+        return Response(dumps({"message": "알람이 설정되었습니다."}), status=201, mimetype='application/json')
 
 
 # 주식 목록 조회 API
