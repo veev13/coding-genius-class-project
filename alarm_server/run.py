@@ -83,4 +83,3 @@ for message in consumer:
         conn.commit()
 
 print('PROGRAM END')
-
