@@ -35,10 +35,9 @@ index = None
 index, data = c.kv.get('aws_config', index=index)
 aws_config = loads(data['Value'])
 system('mkdir ~/.aws')
-with open('~/.aws/credentials', 'w') as f:
-    f.write('[default]\n')
-    f.write(f'aws_access_key_id={aws_config["aws_access_key_id"]}\n')
-    f.write(f'aws_secret_access_key={aws_config["aws_secret_access_key"]}\n')
+access_key = aws_config["aws_access_key_id"]
+secret_key = aws_config["aws_secret_access_key"]
+system('echo f"[default]\naws_access_key_id={access_key}\naws_secret_access_key={secret_key}" > ~/.aws/credentials')
 
 my_config = Config(
     region_name='us-east-1',
