@@ -20,8 +20,6 @@ cursor = conn.cursor()
 
 
 # 추천 종목 API
-
-
 class Recommand(Resource):
     def get(self):
         # max = """
@@ -34,7 +32,7 @@ class Recommand(Resource):
             "SELECT stock_code " \
             "FROM Recommands JOIN Stocks " \
             "WHERE Recommands.stock_id = Stocks.stock_id AND " \
-            "similarity=" \
+            "similarity >=" \
             "(SELECT MAX(similarity) FROM Recommands ORDER BY recommand_time DESC LIMIT 10)"
 
         cursor.execute(max)

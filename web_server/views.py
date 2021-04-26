@@ -123,6 +123,22 @@ def my_page():
     return render_template('mypage.html', values=values)
 
 
+@app.route('/alarm', methods=['post'])
+def stock_alarm():
+    jwt = request.cookies.get("access_token_cookie")
+    json_data = request.form
+    headers = {
+        "Authorization": "Bearer " + (jwt if jwt else ""),
+    }
+    alarm_set_res = requests.post(stock_server_host + '/alarms', json=json_data, headers=headers)
+    if alarm_set_res.status_code == 201:
+        message = alarm_set_res.json()['message']
+    else:
+        message = "잘못된 접근입니다."
+
+    return render_template('message.html', message=message)
+
+
 @app.route('/stock')
 def stock_detail():
     stock = request.args.get('stock')
@@ -229,4 +245,4 @@ def signup():
         response = requests.post(login_server + '/signup', json=json_data)
         print(response.json())
         message = response.json()['message']
-        return render_template('signup.html', message=message)
+        return render_template('message.html', message=message)

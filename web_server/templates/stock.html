@@ -1,17 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
-
-
 {% if message %}
 <div>{{message}}</div>
 {% endif %}
-<div id="chart" style="width: 900px; height: 500px"></div>
-{% if values.logged_in %}
-<a href="#" class="btn btn-success" onclick="stockSell()">매도</a>
-<a href="#" class="btn btn-success" onclick="stockBuy()">매수</a>
-{% endif %}
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
+<div align="center">
+    <div id="chart" style="width: 900px; height: 500px"></div>
+    {% if values.logged_in %}
+    <a href="#" class="btn btn-success" onclick="stockSell()">매도</a>
+    <a href="#" class="btn btn-success" onclick="stockBuy()">매수</a>
+    <br/>
+    <form action="{{url_for('stock_alarm')}}" method="post">
+        <input type="hidden" name="stock_code" value="{{values.chart_code}}"/>
+        <input type="number" name="price" placeholder="알람 가격">
+        <select name="condition_type">
+            <option value="0">이상</option>
+            <option value="1">이하</option>
+        </select>
+        <input class="btn btn-success" type="submit" value="알람 설정">
+    </form>
+    {% endif %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
 
 google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(drawChart);
@@ -36,5 +45,7 @@ google.charts.load('current', {'packages':['corechart']});
     }
 
 
-</script>
+
+    </script>
+</div>
 {% endblock %}
