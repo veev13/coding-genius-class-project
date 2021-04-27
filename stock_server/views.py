@@ -123,7 +123,7 @@ class StockSell(Resource):
         stock_code = json_data['stock_code']
         sell_count = int(json_data['count'])
 
-        stock_id = get_stock_id_by_stock_code(stock_code)
+        stock_id,stock_name = get_stock_id_by_stock_code(stock_code)
         if type(stock_id) is wrappers.Response:
             return stock_id
 
