@@ -35,9 +35,10 @@ index = None
 index, data = c.kv.get('aws_config', index=index)
 aws_config = loads(data['Value'])
 system('mkdir ~/.aws')
-access_key = aws_config["aws_access_key_id"]
-secret_key = aws_config["aws_secret_access_key"]
-system(f'echo "[default]\naws_access_key_id={access_key}\naws_secret_access_key={secret_key}" > ~/.aws/credentials')
+access_key = aws_config['aws_access_key_id']
+secret_key = aws_config['aws_secret_access_key']
+echo = f'echo \'[default]\naws_access_key_id={access_key}\naws_secret_access_key={secret_key}\' > ~/.aws/credentials'
+system(echo)
 
 my_config = Config(
     region_name='us-east-1',
@@ -53,7 +54,7 @@ search_sql = 'SELECT Users.user_id, email ' \
              'FROM Users JOIN Alarms ' \
              'WHERE Users.user_id = Alarms.user_id AND ' \
              'stock_id = ? AND ' \
-             '((condition_type = 0 AND price >= ?) OR (condition_type = 1 AND price <= ?))'
+             '((condition_type = 0 AND price <= ?) OR (condition_type = 1 AND price >= ?))'
 get_stock_name_sql = 'SELECT stock_name ' \
                      'FROM Stocks ' \
                      'WHERE stock_id = ?'
@@ -73,12 +74,16 @@ for message in consumer:
 
     cursor.execute(search_sql, [stock_id, trade_price, trade_price])
     result_set = cursor.fetchall()
+    print(result_set)
     for user_id, phone_number in result_set:
-        response = client.publish(
-            PhoneNumber=phone_number,
-            Message=f'[내일은 투자왕:{updated_time}]{stock_name} 주가 {trade_price}입니다.',
-        )
-        print(f'send {updated_time}, {stock_name} to {phone_number}')
+        try:
+            response = client.publish(
+                PhoneNumber=phone_number,
+                Message=f'[내일은 투자왕:{updated_time}]{stock_name} {trade_price}원입니다.',
+            )
+            print(f'send {updated_time}, {stock_name} to {phone_number}')
+        except:
+            print(f'can not send to {phone_number}')
         cursor.execute(alarm_delete_sql, [user_id, stock_id])
         conn.commit()
 
